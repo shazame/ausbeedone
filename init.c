@@ -93,6 +93,10 @@ void init_turbine(void)
   // control structures
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);  // give clock to the GPIO
 
+  platform_gpio_init(GPIO1, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);                                 // init gpio for turbine enable
+
+  platform_set_GPIO(GPIO1);                              // desable turbine
+
   TIM_TimeBaseInitTypeDef TimeBaseInit_PWM;
   TIM_OCInitTypeDef OCInitTypeDef_PWM;
   GPIO_InitTypeDef InitTypeDef_PWM;
