@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
+
 #include "stm32f4xx_conf.h"
 #include "FreeRTOS.h"
 #include "list.h"
@@ -10,16 +11,19 @@
 #include "semphr.h"
 #include "platform.h"
 #include "misc.h"
+
 #include <AUSBEE/l298_driver.h>
 #include <AUSBEE/encoder.h>
-#include "asserv_manager.h"
+
 #include "utils/init.h"
+#include "asserv_manager.h"
+#include "trajectory_manager.h"
 
 // Private function prototypes
 void blink1();
-void coucou();
 // Global variables
-//static xSemaphoreHandle xTestSemaphore = NULL;
+struct trajectory_manager traj;
+struct ausbee_cs cs;
 struct ausbee_l298_chip mot_droit, mot_gauche;
 
 xSemaphoreHandle CANReceiveSemaphore;
@@ -53,9 +57,11 @@ int main(void) {
   // Init motors
   init_mot(&mot_droit, &mot_gauche);
 
+  // Init trajectory manager
+  set_motors(&traj, &mot_droit, &mot_gauche);
+
   // Launching control system
-  struct ausbee_cs cs;
-  //start_control_system(&cs);
+  start_control_system(&cs, &traj);
   // TODO: passer la main au traj manager
 
   xTaskCreate(blink1, (const signed char *)"LED1", 340, NULL, 1, NULL );
@@ -72,15 +78,15 @@ int main(void) {
   return 0;
 }
 
-void blink1() {
+void blink1(void) {
   /* Block for 500ms. */
   //const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 
   for(;;) {
-    //platform_toggle_led(PLATFORM_LED0);
+    platform_toggle_led(PLATFORM_LED0);
     printf("count: %d\r\n", TIM3->CNT);
     printf("count sum: %d\r\n", count_sum);
-    vTaskDelay(1 * portTICK_RATE_MS);
+    vTaskDelay(10 * portTICK_RATE_MS);
   }
 }
 
