@@ -10,7 +10,7 @@
 #include "semphr.h"
 #include "platform.h"
 #include "misc.h"
-#include "init.h"
+#include "utils/init.h"
 
 #include "AUSBEE/servo.h"
 
