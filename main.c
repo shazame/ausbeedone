@@ -42,14 +42,14 @@ void asserv_tempo();
 void foutre_les_fresque();
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
 
-volatile ausbee_lidar_data data[AUSBEE_LIDAR_PICCOLO_DATA_LENGTH];
+volatile struct ausbee_lidar_data data[AUSBEE_LIDAR_PICCOLO_DATA_LENGTH];
 volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
 xSemaphoreHandle USART1ReceiveHandle;
 xSemaphoreHandle CANReceiveSemaphore;
 CanRxMsg CAN_RxStruct;
 
-ausbee_l298_chip mot_gauche;	//branché sur mot1
-ausbee_l298_chip mot_droit;		//branché sur mot2
+struct ausbee_l298_chip mot_gauche;	//branché sur mot1
+struct ausbee_l298_chip mot_droit;		//branché sur mot2
 uint8_t enable_turbine=0;
 ausbeeServo servo1, servo2, servo3, servo4;
 
