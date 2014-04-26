@@ -83,3 +83,8 @@ void blink1() {
     vTaskDelay(1 * portTICK_RATE_MS);
   }
 }
+
+//#define init_servo(servo, NUM) \
+//{
+//  servo.TIMx = SERVO##NUM##_TIM;
+//
