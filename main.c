@@ -12,8 +12,8 @@
 #include "misc.h"
 #include <AUSBEE/l298_driver.h>
 #include <AUSBEE/encoder.h>
-#include "init.h"
 #include "asserv_manager.h"
+#include "utils/init.h"
 
 // Private function prototypes
 void blink1();
