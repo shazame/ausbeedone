@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 
 #include "FreeRTOS.h"
@@ -31,7 +32,9 @@ void control_system_task(void *data)
 {
   for (;;) {
     struct ausbee_cs *cs = (struct ausbee_cs *)data;
-    ausbee_cs_update(cs);
+    // TODO: get measure
+    int32_t measure = -3;
+    ausbee_cs_update(cs, measure);
     vTaskDelay(10 * portTICK_RATE_MS);
   }
 }
