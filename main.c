@@ -16,6 +16,7 @@
 #include <AUSBEE/encoder.h>
 
 #include "utils/init.h"
+#include "utils/encoders.h"
 #include "asserv_manager.h"
 #include "trajectory_manager.h"
 
@@ -37,7 +38,8 @@ void TIM8_UP_TIM13_IRQHandler(void)
   if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
     count = TIM3->CNT;
     count_sum += count;
-    TIM_SetCounter(TIM3, 0);
+    set_right_encoder_value(TIM3->CNT);
+    //TIM_SetCounter(TIM3, 0);
     //ausbee_l298_set_duty_cycle(l298_chip, ausbee_eval_pid(&pid, count));
     TIM_ClearFlag(TIM8, TIM_FLAG_Update);
   }
