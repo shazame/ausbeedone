@@ -8,7 +8,6 @@
 
 #include "utils/encoders.h"
 #include "asserv_manager.h"
-#include "trajectory_manager.h"
 
 #define PID_Kp 10
 #define PID_Ki 1
@@ -16,26 +15,37 @@
 
 void control_system_task(void *data);
 
-struct ausbee_pid pid;
+struct asserv_manager am;
 
-void start_control_system(struct ausbee_cs *cs, struct trajectory_manager *traj)
+void start_control_system(struct asserv_manager *am, struct trajectory_manager *traj)
 {
-  ausbee_init_pid(&pid, PID_Kp, PID_Ki, PID_Kd, 1000, 100, 0);
+  ausbee_init_pid(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd, 1000, 100, 0);
+  ausbee_init_pid(&(am->pid_left_motor), PID_Kp, PID_Ki, PID_Kd, 1000, 100, 0);
 
-  ausbee_cs_init(cs);
+  // Initialise each control system manager
+  ausbee_cs_init(&(am->csm_right_motor));
+  ausbee_cs_init(&(am->csm_left_motor));
+
   // We use a pid controller because we like it here at Eirbot
-  ausbee_cs_set_controller(cs, ausbee_eval_pid, (void*)&pid);
-  ausbee_cs_set_process_command(cs, right_motor_set_duty_cycle , traj);
+  ausbee_cs_set_controller(&(am->csm_right_motor), ausbee_eval_pid, (void*)&(am->pid_right_motor));
+  ausbee_cs_set_controller(&(am->csm_left_motor), ausbee_eval_pid, (void*)&(am->pid_left_motor));
 
-  xTaskCreate(control_system_task, (const signed char *)"ControlSystem", 1000, (void *)cs, 1, NULL);
+  ausbee_cs_set_process_command(&(am->csm_right_motor), right_motor_set_duty_cycle , traj);
+  ausbee_cs_set_process_command(&(am->csm_left_motor), left_motor_set_duty_cycle , traj);
+
+  xTaskCreate(control_system_task, (const signed char *)"ControlSystem", 1000, (void *)am, 1, NULL);
 }
 
 void control_system_task(void *data)
 {
   for (;;) {
-    struct ausbee_cs *cs = (struct ausbee_cs *)data;
-    int32_t measure = get_right_encoder_value();
-    ausbee_cs_update(cs, measure);
+    struct asserv_manager *am = (struct asserv_manager *)data;
+
+    printf("Right motor:\r\n");
+    ausbee_cs_update(&(am->csm_right_motor), get_right_encoder_value());
+    printf("Left motor:\r\n");
+    ausbee_cs_update(&(am->csm_left_motor), get_left_encoder_value());
+
     vTaskDelay(1 * portTICK_RATE_MS);
   }
 }

@@ -24,7 +24,7 @@
 void blink1();
 // Global variables
 struct trajectory_manager traj;
-struct ausbee_cs cs;
+struct asserv_manager am;
 struct ausbee_l298_chip mot_droit, mot_gauche;
 
 xSemaphoreHandle CANReceiveSemaphore;
@@ -33,7 +33,8 @@ CanRxMsg CAN_RxStruct;
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
-    set_right_encoder_value(TIM3->CNT);
+    set_right_encoder_value(TIM1->CNT);
+    set_left_encoder_value(TIM3->CNT);
     //TIM_SetCounter(TIM3, 0);
     TIM_ClearFlag(TIM8, TIM_FLAG_Update);
   }
@@ -46,9 +47,15 @@ int main(void) {
   platform_init_LED();
 
   // Encoder setup
+  ausbee_init_sampling_timer(TIM8, 16800, 1000);
+
+  // Left encoder
+  platform_encoder1_init();
+  ausbee_encoder_init_timer(TIM1);
+
+  // Right encoder
   platform_encoder2_init();
   ausbee_encoder_init_timer(TIM3);
-  ausbee_init_sampling_timer(TIM8, 16800, 1000);
 
   // Init motors
   init_mot(&mot_droit, &mot_gauche);
@@ -57,7 +64,7 @@ int main(void) {
   set_motors(&traj, &mot_droit, &mot_gauche);
 
   // Launching control system
-  start_control_system(&cs, &traj);
+  start_control_system(&am, &traj);
   // TODO: passer la main au traj manager
 
   xTaskCreate(blink1, (const signed char *)"LED1", 340, NULL, 1, NULL );
