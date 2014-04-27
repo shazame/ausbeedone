@@ -29,18 +29,12 @@ struct ausbee_l298_chip mot_droit, mot_gauche;
 
 xSemaphoreHandle CANReceiveSemaphore;
 CanRxMsg CAN_RxStruct;
-uint32_t count_sum = 0;
 
 void TIM8_UP_TIM13_IRQHandler(void)
 {
-  uint32_t count;
-
   if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
-    count = TIM3->CNT;
-    count_sum += count;
     set_right_encoder_value(TIM3->CNT);
     //TIM_SetCounter(TIM3, 0);
-    //ausbee_l298_set_duty_cycle(l298_chip, ausbee_eval_pid(&pid, count));
     TIM_ClearFlag(TIM8, TIM_FLAG_Update);
   }
 }
@@ -86,8 +80,6 @@ void blink1(void) {
 
   for(;;) {
     platform_toggle_led(PLATFORM_LED0);
-    printf("count: %d\r\n", TIM3->CNT);
-    printf("count sum: %d\r\n", count_sum);
     vTaskDelay(10 * portTICK_RATE_MS);
   }
 }
