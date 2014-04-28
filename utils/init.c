@@ -8,8 +8,8 @@ void init_usart_interrupt()
   NVIC_InitTypeDef NVIC_InitStructure;
   USART_ITConfig(USART1,USART_IT_RXNE, ENABLE);
   NVIC_InitStructure.NVIC_IRQChannel=USART1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=NVIC_PriorityGroup_0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority=NVIC_PriorityGroup_0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
   NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 }
@@ -19,8 +19,8 @@ void init_can_rx_interrupt()
   NVIC_InitTypeDef NVIC_InitStructure;
   CAN_ITConfig(CAN1,CAN_IT_FMP0, ENABLE);
   NVIC_InitStructure.NVIC_IRQChannel=CAN1_RX0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=NVIC_PriorityGroup_0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority=NVIC_PriorityGroup_0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
   NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 
