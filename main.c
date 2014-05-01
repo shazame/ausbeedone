@@ -33,8 +33,8 @@ CanRxMsg CAN_RxStruct;
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
-    set_right_encoder_value(TIM1->CNT);
-    set_left_encoder_value(TIM3->CNT);
+    set_left_encoder_value(TIM1->CNT);
+    set_right_encoder_value(TIM3->CNT);
     //TIM_SetCounter(TIM3, 0);
     TIM_ClearFlag(TIM8, TIM_FLAG_Update);
   }
@@ -69,9 +69,6 @@ int main(void) {
 
   xTaskCreate(blink1, (const signed char *)"LED1", 340, NULL, 1, NULL );
 
-  // Go forward, with half power
-  ausbee_l298_set_duty_cycle(mot_droit, 100);
-
   vTaskStartScheduler();
 
   for(;;) {
@@ -90,8 +87,3 @@ void blink1(void) {
     vTaskDelay(10 * portTICK_RATE_MS);
   }
 }
-
-//#define init_servo(servo, NUM) \
-//{
-//  servo.TIMx = SERVO##NUM##_TIM;
-//
