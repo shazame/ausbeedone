@@ -94,7 +94,6 @@ void init_turbine(void)
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);  // give clock to the GPIO
 
   TIM_TimeBaseInitTypeDef TimeBaseInit_PWM;
-  TIM_OCInitTypeDef OCInitTypeDef_PWM;
   GPIO_InitTypeDef InitTypeDef_PWM;
 
   TIM_TimeBaseStructInit(&TimeBaseInit_PWM);             // initialize the struct
