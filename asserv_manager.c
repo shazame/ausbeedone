@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -10,7 +11,7 @@
 #include "asserv_manager.h"
 
 #define PID_Kp 10
-#define PID_Ki 1
+#define PID_Ki 0
 #define PID_Kd 2
 
 void control_system_task(void *data);
@@ -41,10 +42,13 @@ void control_system_task(void *data)
   for (;;) {
     struct asserv_manager *am = (struct asserv_manager *)data;
 
-    printf("Right motor:\r\n");
-    ausbee_cs_update(&(am->csm_right_motor), get_right_encoder_value());
-    printf("Left motor:\r\n");
-    ausbee_cs_update(&(am->csm_left_motor), get_left_encoder_value());
+    int32_t right_motor_command = ausbee_cs_update(&(am->csm_right_motor), get_right_encoder_value());
+    int32_t left_motor_command = ausbee_cs_update(&(am->csm_left_motor), get_left_encoder_value());
+
+    printf("Measure: %"PRId32": 1,", get_right_encoder_value());
+    printf("Error: %"PRId32": 1,", ausbee_get_pid_error(&(am->pid_right_motor)));
+    printf("Error sum: %"PRId32": 0.1,", ausbee_get_pid_error_sum(&(am->pid_right_motor)));
+    printf("Command: %"PRId32": 10\r\n", right_motor_command);
 
     vTaskDelay(1 * portTICK_RATE_MS);
   }
