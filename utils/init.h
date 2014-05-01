@@ -13,5 +13,6 @@ void init_usart_interrupt();
 //void init_servo();
 void init_mot(struct ausbee_l298_chip* mot_droit, struct ausbee_l298_chip *mot_gauche);
 void init_turbine();
+void init_lidar();
 
 #endif //INIT_H

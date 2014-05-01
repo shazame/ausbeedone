@@ -11,24 +11,9 @@
 #include "platform.h"
 #include "misc.h"
 #include "utils/init.h"
-
+#include "utils/define.h"
+#include "utils/actions.h"
 #include "AUSBEE/servo.h"
-
-#define SERVO_FROM_MODULE_0 0x01  //canon bas
-#define SERVO_FROM_MODULE_1 0x02  //canon haut
-#define SERVO_FROM_MODULE_2 0x04  //Bras gauche (coté ausbee) rentré :12 ouvert: 70
-#define SERVO_FROM_MODULE_3 0x08  //Bras droit (alim) rentré: 91 ouvert : 35
-#define SERVO_FROM_MODULE_4 0x10  //peinture ausbee sortie: 4 rentré: 52
-#define SERVO_FROM_MODULE_5 0x20  //peinture canon sortie: 80 rentré : 40
-#define SERVO_FROM_MODULE_6 0x40
-#define SERVO_FROM_MODULE_7 0x80
-
-#define SERVO_CANON_BAS            SERVO_FROM_MODULE_0 //fermé :79  ouvert: 50
-#define SERVO_CANON_HAUT           SERVO_FROM_MODULE_1 //fermé :24  ouvert: 62
-#define SERVO_BRAS_GAUCHE          SERVO_FROM_MODULE_2
-#define SERVO_BRAS_DROITE          SERVO_FROM_MODULE_3
-#define SERVO_PEINTURE_COTE_AUSBEE SERVO_FROM_MODULE_4
-#define SERVO_PEINTURE_CANON       SERVO_FROM_MODULE_5
 
 
 // Private function prototypes
@@ -41,6 +26,7 @@ void init_servo();
 void asserv_tempo();
 void foutre_les_fresque();
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
+void lidar_detect_in_circle();
 
 volatile struct ausbee_lidar_data data[AUSBEE_LIDAR_PICCOLO_DATA_LENGTH];
 volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
@@ -50,19 +36,19 @@ CanRxMsg CAN_RxStruct;
 
 struct ausbee_l298_chip mot_gauche; //branché sur mot1
 struct ausbee_l298_chip mot_droit;  //branché sur mot2
-uint8_t enable_turbine=0;
 ausbeeServo servo1, servo2, servo3, servo4;
 
 int main(void) {
   // Call the platform initialization function
-  platform_init_HSE_PLL();
-  platform_init_USART(USART_DEBUG, 115200);
-  platform_init_USART(USART1,115200);
-  platform_init_LED();
+  platform_HSE_PLL_init();
+  platform_USART_init(USART_DEBUG, 115200);
+  platform_USART_init(USART1,115200);
+  platform_LED_init();
   //platform_CAN_init(CAN1);
   //init_can();
   //init_turbine();
-  init_usart_interrupt();
+  init_lidar();
+  //init_usart_interrupt();
   //init_servo();
   //init_mot(&mot_gauche, &mot_droit);
 
@@ -83,21 +69,22 @@ void blink_led()
   for(;;)
   {
     vTaskDelay(50);
-    platform_toggle_led(PLATFORM_LED0);
+    platform_LED_toggle(PLATFORM_LED0);
   }
 }
 
 void test()
 {
-  test_lidar();
+  lidar_detect_in_circle();
+  //test_lidar();
   while(1);
   //move_zqsd();
   /*init_turbine();
   vTaskDelay(2000);
-  platform_reset_GPIO(GPIO1);
-  platform_toggle_led(PLATFORM_LED4);
+  platform_GPIO_reset(GPIO1);
+  platform_LED_toggle(PLATFORM_LED4);
   vTaskDelay(2000);
-  platform_set_GPIO(GPIO1);
+  platform_GPIO_set(GPIO1);
   */
 
   /*while(1)
@@ -118,14 +105,14 @@ void test()
   }
   while(1);
   uint8_t value;
-  platform_gpio_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_GPIO_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
   while(1){
     value=platform_GPIO_get_value(GPIO9);
     printf("value: %d\r\n",value);
     if(value)
-      platform_set_led(PLATFORM_LED3);
+      platform_LED_set(PLATFORM_LED3);
     else
-      platform_reset_led(PLATFORM_LED3);
+      platform_LED_reset(PLATFORM_LED3);
   }
   while(1){
     ausbeeSetAngleServo(&servo1, 10);
@@ -145,11 +132,11 @@ void asserv_tempo()
   move_servo_from_servo_module(SERVO_PEINTURE_CANON,40);
   move_servo_from_servo_module(SERVO_BRAS_GAUCHE,12);
   move_servo_from_servo_module(SERVO_BRAS_DROITE,91);
-  platform_gpio_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
-  platform_gpio_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
+  platform_GPIO_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_GPIO_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
   while(platform_GPIO_get_value(GPIO8))
     ;
-  platform_reset_GPIO(GPIO1);
+  platform_GPIO_reset(GPIO1);
   ausbee_l298_set_duty_cycle(mot_gauche,60);
   ausbee_l298_set_duty_cycle(mot_droit,60);
   vTaskDelay(80);
@@ -220,7 +207,7 @@ void asserv_tempo()
   vTaskDelay(60);
   move_servo_from_servo_module(SERVO_CANON_HAUT,24);
   vTaskDelay(60);
-  platform_set_GPIO(GPIO1);
+  platform_GPIO_set(GPIO1);
   ausbee_l298_invert_output(mot_gauche,0);
   ausbee_l298_invert_output(mot_droit,1);
   ausbee_l298_set_duty_cycle(mot_gauche,60);
@@ -258,8 +245,8 @@ void foutre_les_fresque()
   move_servo_from_servo_module(SERVO_PEINTURE_COTE_AUSBEE,52);
   move_servo_from_servo_module(SERVO_PEINTURE_CANON,40);
 
-  platform_gpio_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
-  platform_gpio_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
+  platform_GPIO_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_GPIO_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
   while(platform_GPIO_get_value(GPIO8))
     ;
   ausbee_l298_set_duty_cycle(mot_gauche,60);
@@ -296,16 +283,14 @@ void foutre_les_fresque()
 
 void test_lidar()
 {
-  USART1ReceiveHandle=xSemaphoreCreateMutex();
-  if(USART1ReceiveHandle== NULL)
-  {
-    platform_toggle_led(PLATFORM_LED6);
-    while(1)
-      ;
-  }
+  //USART1ReceiveHandle=xSemaphoreCreateMutex();
+  //if(USART1ReceiveHandle== NULL)
+  //{
+  //  platform_LED_toggle(PLATFORM_LED6);
+  //}
   while(1)
   {
-    if(xSemaphoreTake(USART1ReceiveHandle,portMAX_DELAY)==pdTRUE)
+    if(xSemaphoreTake(USART1ReceiveHandle,100)==pdTRUE)
     {
       //if(new_data)
       //  new_data=0;
@@ -314,16 +299,65 @@ void test_lidar()
       int i=0;
       for(i=0; i<4; i++)
       {
-        if ((data[i].distance_mm>270) && (data[i].distance_mm<330))
+        if ((data[i].distance_mm>250) && (data[i].distance_mm<350))
         {
           printf("angle:%d distance:%d \r\n", data[i].angle, data[i].distance_mm);
         }
       }
       //printf("angle1:%d \r\n", data[0].angle);
-      platform_toggle_led(PLATFORM_LED3);
+      platform_LED_toggle(PLATFORM_LED3);
 
       }
     }
+}
+
+void test_lidar_robot_running()
+{
+
+}
+
+//Function used to use the Lidar as a GP2
+//detect all things in a circle in front of the robot
+//Circle parameters: 
+//    --> Diameter: 36 cm
+//    --> center is 10.5cm far from the lidar, aligned with it.
+void lidar_detect_in_circle()
+{
+  while(1)
+  {
+    if(xSemaphoreTake(USART1ReceiveHandle,100)==pdTRUE)
+    {
+      ausbee_lidar_parse_piccolo(buffer,data);
+      int i=0;
+      for(i=0; i<AUSBEE_LIDAR_PICCOLO_DATA_LENGTH; i++)
+      {
+	      if ((!data[i].error) && (!data[i].strengthWarning)) //If data is valid
+        { 
+          double x, y;
+          double angleRad;
+
+          angleRad = data[i].angle * 2 * M_PI / 360.0; // Degree to radian conversion
+
+          //x = (double)data[i].distance_mm*cos((float)(angleRad))-(double)DISTANCE_CENTER_TO_LIDAR;
+          //y = (double)data[i].distance_mm*sin((float)(angleRad));
+          //if (data[i].distance_mm<400)
+          //{ 
+          //  printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
+          //  printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
+          //}
+          // Get point coordinates
+          
+          x = (double)data[i].distance_mm*cos((float)(angleRad))-(double)DISTANCE_CENTER_TO_LIDAR;
+          y = (double)data[i].distance_mm*sin((float)(angleRad));
+          if(sqrt(x*x+y*y)<(double)(CIRCLE_LIDAR_DIAMETER/2))
+          {
+            printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
+            printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
+          }
+        }
+      }
+    }
+  }
 }
 
 void move_zqsd()
@@ -360,7 +394,7 @@ void move_zqsd()
     vTaskDelay(200);
     ausbee_l298_set_duty_cycle(mot_gauche,0);
     ausbee_l298_set_duty_cycle(mot_droit,0);
-    platform_toggle_led(PLATFORM_LED6);
+    platform_LED_toggle(PLATFORM_LED6);
   }
 }
 
@@ -369,7 +403,7 @@ void test_canon()
   ausbeeSetAngleServo(&servo2, 25);
   ausbeeSetAngleServo(&servo3, 80);
   init_turbine();
-  platform_toggle_led(PLATFORM_LED6);
+  platform_LED_toggle(PLATFORM_LED6);
   vTaskDelay(1500);
   while(1)
   {
@@ -386,91 +420,11 @@ void test_canon()
   while(1);
 }
 
-void move_servo_from_servo_module(uint8_t servo, uint8_t angle)
-{
-  angle = (angle > 100) ? 100 : angle;
-  printf("angle :%d \r\n", angle);
-  CanTxMsg CAN_Tx;
-  uint8_t mailbox_number = 0;
-  if(servo & SERVO_FROM_MODULE_0)
-  {
-    CAN_Tx.StdId = 0x80;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  if(servo & SERVO_FROM_MODULE_1)
-  {
-    CAN_Tx.StdId = 0x81;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  if(servo & SERVO_FROM_MODULE_2)
-  {
-    CAN_Tx.StdId = 0x82;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  if(servo & SERVO_FROM_MODULE_3)
-  {
-    CAN_Tx.StdId = 0x83;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  if(servo & SERVO_FROM_MODULE_4)
-  {
-    CAN_Tx.StdId = 0x84;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  if(servo & SERVO_FROM_MODULE_5)
-  {
-    CAN_Tx.StdId = 0x85;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  if(servo & SERVO_FROM_MODULE_6)
-  {
-    CAN_Tx.StdId = 0x86;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  if(servo & SERVO_FROM_MODULE_7)
-  {
-    CAN_Tx.StdId = 0x87;
-    CAN_Tx.Data[0] = angle;
-  }
-
-  CAN_Tx.ExtId = 0;
-  CAN_Tx.IDE = CAN_Id_Standard;
-  CAN_Tx.RTR = CAN_RTR_Data;
-  CAN_Tx.DLC = 1;
-
-  mailbox_number = CAN_Transmit(CAN1, &CAN_Tx);
-  if(mailbox_number == CAN_TxStatus_NoMailBox)
-    platform_set_led(PLATFORM_LED3);
-  uint8_t transmit_status = CAN_TransmitStatus(CAN1, mailbox_number);
-  while(transmit_status!=CAN_TxStatus_Ok){
-    transmit_status = CAN_TransmitStatus(CAN1, mailbox_number);
-    if(transmit_status == CAN_TxStatus_Ok)
-    {
-      platform_set_led(PLATFORM_LED4);
-      platform_reset_led(PLATFORM_LED7);
-    }
-    else if( transmit_status == CAN_TxStatus_Pending)
-    {
-      platform_set_led(PLATFORM_LED7);
-    }
-    else
-      platform_set_led(PLATFORM_LED6);
-  }
-
-  //vTaskDelay(100);
-}
 
 void init_servo()
 {
-  platform_initPWM(TIMER10);
-  //platform_initPWM(TIMERALL);
+  platform_PWM_init(TIMER10);
+  //platform_PWM_init(TIMERALL);
   ausbeeInitStructServo(& servo1);
   servo1.TIMx = SERVO1_TIM;
   servo1.CHANx = SERVO1_CHAN;

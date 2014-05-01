@@ -1,15 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "init.h"
+#include "FreeRTOS.h"
+#include "list.h"
+#include "queue.h"
+#include "task.h"
+#include "semphr.h"
 
+extern xSemaphoreHandle USART1ReceiveHandle;
 
 void init_usart_interrupt()
 {
   NVIC_InitTypeDef NVIC_InitStructure;
   USART_ITConfig(USART1,USART_IT_RXNE, ENABLE);
   NVIC_InitStructure.NVIC_IRQChannel=USART1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=NVIC_PriorityGroup_0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority=NVIC_PriorityGroup_0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
   NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 }
@@ -19,8 +25,8 @@ void init_can_rx_interrupt()
   NVIC_InitTypeDef NVIC_InitStructure;
   CAN_ITConfig(CAN1,CAN_IT_FMP0, ENABLE);
   NVIC_InitStructure.NVIC_IRQChannel=CAN1_RX0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=NVIC_PriorityGroup_0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority=NVIC_PriorityGroup_0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
   NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 
@@ -36,7 +42,7 @@ void init_can()
   CAN_InitTypeDef_1.CAN_AWUM = ENABLE;
   CAN_InitTypeDef_1.CAN_TXFP = ENABLE;
   if(CAN_Init(CAN1, &CAN_InitTypeDef_1) == CAN_InitStatus_Failed) {
-    platform_set_led(PLATFORM_LED2);
+    platform_LED_set(PLATFORM_LED2);
     while(1);
   }
 
@@ -64,10 +70,10 @@ void init_mot(struct ausbee_l298_chip* mot2, struct ausbee_l298_chip* mot1)
   mot2->gpio_enable_port=PLATFORM_ENABLE_MOTOR2_PORT;
   mot2->TIMx=TIM9;
   enum AUSBEE_L298_DRIVER_ERROR error;
-  platform_init_io_motor2();
+  platform_MOTOR2_init_io();
   error=ausbee_l298_init_chip(*mot2);
   if (error==ENO_ERROR)
-    platform_toggle_led(PLATFORM_LED1);
+    platform_LED_toggle(PLATFORM_LED1);
   ausbee_l298_enable_chip(*mot2, 1);
 
   mot1->timer_channel=1;
@@ -77,10 +83,10 @@ void init_mot(struct ausbee_l298_chip* mot2, struct ausbee_l298_chip* mot1)
   mot1->gpio_dir_port=PLATFORM_DIR_MOTOR1_PORT;
   mot1->gpio_enable_port=PLATFORM_ENABLE_MOTOR1_PORT;
   mot1->TIMx=TIM9;
-  platform_init_io_motor1();
+  platform_MOTOR1_init_io();
   error=ausbee_l298_init_chip(*mot1);
   if (error==ENO_ERROR)
-    platform_toggle_led(PLATFORM_LED2);
+    platform_LED_toggle(PLATFORM_LED2);
   ausbee_l298_enable_chip(*mot1, 1);
 
 }
@@ -93,12 +99,11 @@ void init_turbine(void)
   // control structures
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);  // give clock to the GPIO
 
-  platform_gpio_init(GPIO1, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);                                 // init gpio for turbine enable
+  platform_GPIO_init(GPIO1, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);                                 // init gpio for turbine enable
 
-  platform_set_GPIO(GPIO1);                              // desable turbine
+  platform_GPIO_set(GPIO1);                              // desable turbine
 
   TIM_TimeBaseInitTypeDef TimeBaseInit_PWM;
-  TIM_OCInitTypeDef OCInitTypeDef_PWM;
   GPIO_InitTypeDef InitTypeDef_PWM;
 
   TIM_TimeBaseStructInit(&TimeBaseInit_PWM);             // initialize the struct
@@ -129,3 +134,14 @@ void init_turbine(void)
   OCInit_PWM.TIM_OutputState = TIM_OutputState_Enable;
   TIM_OC1Init(TIM10, &OCInit_PWM);                       // Initialize OSC1
 }
+
+void init_lidar()
+{
+  init_usart_interrupt();
+  USART1ReceiveHandle=xSemaphoreCreateMutex();
+  if(USART1ReceiveHandle== NULL)
+  {
+    platform_LED_toggle(PLATFORM_LED6);
+  }
+}
+
