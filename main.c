@@ -42,9 +42,9 @@ void TIM8_UP_TIM13_IRQHandler(void)
 
 int main(void) {
   // Call the platform initialization function
-  platform_init_HSE_PLL();
-  platform_init_USART(USART_DEBUG, 115200);
-  platform_init_LED();
+  platform_hse_pll_init();
+  platform_usart_init(USART_DEBUG, 115200);
+  platform_led_init();
 
   // Encoder setup
   ausbee_init_sampling_timer(TIM8, 16800, 1000);
@@ -85,7 +85,7 @@ void blink1(void) {
   //const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 
   for(;;) {
-    platform_toggle_led(PLATFORM_LED0);
+    platform_led_toggle(PLATFORM_LED0);
     vTaskDelay(10 * portTICK_RATE_MS);
   }
 }
