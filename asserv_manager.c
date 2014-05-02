@@ -8,7 +8,7 @@
 
 #include <AUSBEE/pid.h>
 
-#include "utils/encoders.h"
+#include "utils/position_manager.h"
 #include "asserv_manager.h"
 
 #define PID_Kp 10
@@ -43,16 +43,16 @@ void control_system_task(void *data)
   for (;;) {
     struct asserv_manager *am = (struct asserv_manager *)data;
 
-    int32_t right_motor_command = ausbee_cs_update(&(am->csm_right_motor), encoders_get_right_value());
-    int32_t left_motor_command = ausbee_cs_update(&(am->csm_left_motor), encoders_get_left_value());
+    int32_t right_motor_command = ausbee_cs_update(&(am->csm_right_motor), position_get_right_encoder());
+    int32_t left_motor_command = ausbee_cs_update(&(am->csm_left_motor), position_get_left_encoder());
 
-    printf("Right Measure: %"PRId32": 1,", encoders_get_right_value());
+    printf("Right Measure: %"PRId32": 1,", position_get_right_encoder());
     printf("Right Reference: %"PRId32": 1,", ausbee_pid_get_ref(&(am->pid_right_motor)));
     printf("Right Error: %"PRId32": 1,", ausbee_get_pid_error(&(am->pid_right_motor)));
     printf("Right Error sum: %"PRId32": 0.1,", ausbee_get_pid_error_sum(&(am->pid_right_motor)));
     printf("Right Command: %"PRId32": 10\r\n", right_motor_command);
 
-    printf("Left Measure: %"PRId32": 1,", encoders_get_left_value());
+    printf("Left Measure: %"PRId32": 1,", position_get_left_encoder());
     printf("Left Reference: %"PRId32": 1,", ausbee_pid_get_ref(&(am->pid_left_motor)));
     printf("Left Error: %"PRId32": 1,", ausbee_get_pid_error(&(am->pid_left_motor)));
     printf("Left Error sum: %"PRId32": 0.1,", ausbee_get_pid_error_sum(&(am->pid_left_motor)));
