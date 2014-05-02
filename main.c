@@ -26,7 +26,6 @@ void run_motors();
 // Global variables
 struct asserv_manager am;
 struct ausbee_l298_chip mot_droit, mot_gauche;
-struct motors_wrapper mots_wrap;
 
 int32_t right_motor_ref = 0;
 
@@ -66,10 +65,10 @@ int main(void) {
   init_mot(&mot_droit, &mot_gauche);
 
   // Init trajectory manager
-  motors_wrapper_init(&mots_wrap, &mot_droit, &mot_gauche);
+  motors_wrapper_init(&mot_droit, &mot_gauche);
 
   // Launching control system
-  start_control_system(&am, &mots_wrap);
+  start_control_system(&am);
   // TODO: passer la main au traj manager
 
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );

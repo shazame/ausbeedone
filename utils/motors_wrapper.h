@@ -8,10 +8,9 @@ struct motors_wrapper {
   struct ausbee_l298_chip *right_motor, *left_motor;
 };
 
-void motors_wrapper_init(struct motors_wrapper   *mots,
-                         struct ausbee_l298_chip *right_motor,
+void motors_wrapper_init(struct ausbee_l298_chip *right_motor,
                          struct ausbee_l298_chip *left_motor);
-void motors_wrapper_right_motor_set_duty_cycle(void *mots, int32_t duty_cycle);
-void motors_wrapper_left_motor_set_duty_cycle(void *mots, int32_t duty_cycle);
+void motors_wrapper_right_motor_set_duty_cycle(void *dummy, int32_t duty_cycle);
+void motors_wrapper_left_motor_set_duty_cycle(void *dummy, int32_t duty_cycle);
 
 #endif /* MOTORS_WRAPPER_H */

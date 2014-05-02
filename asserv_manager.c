@@ -19,7 +19,7 @@ void control_system_task(void *data);
 
 struct asserv_manager am;
 
-void start_control_system(struct asserv_manager *am, struct motors_wrapper *mots_wrap)
+void start_control_system(struct asserv_manager *am)
 {
   ausbee_init_pid(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd, 100, 0);
   ausbee_init_pid(&(am->pid_left_motor), PID_Kp, PID_Ki, PID_Kd, 100, 0);
@@ -32,8 +32,8 @@ void start_control_system(struct asserv_manager *am, struct motors_wrapper *mots
   ausbee_cs_set_controller(&(am->csm_right_motor), ausbee_eval_pid, (void*)&(am->pid_right_motor));
   ausbee_cs_set_controller(&(am->csm_left_motor), ausbee_eval_pid, (void*)&(am->pid_left_motor));
 
-  ausbee_cs_set_process_command(&(am->csm_right_motor), motors_wrapper_right_motor_set_duty_cycle, mots_wrap);
-  ausbee_cs_set_process_command(&(am->csm_left_motor), motors_wrapper_left_motor_set_duty_cycle, mots_wrap);
+  ausbee_cs_set_process_command(&(am->csm_right_motor), motors_wrapper_right_motor_set_duty_cycle, NULL);
+  ausbee_cs_set_process_command(&(am->csm_left_motor), motors_wrapper_left_motor_set_duty_cycle, NULL);
 
   xTaskCreate(control_system_task, (const signed char *)"ControlSystem", 1000, (void *)am, 1, NULL);
 }
