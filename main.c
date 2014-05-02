@@ -16,7 +16,6 @@
 #include <AUSBEE/encoder.h>
 
 #include "utils/init.h"
-#include "utils/encoders.h"
 #include "utils/motors_wrapper.h"
 #include "asserv_manager.h"
 
@@ -34,16 +33,6 @@ volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
 xSemaphoreHandle USART1ReceiveHandle;
 xSemaphoreHandle CANReceiveSemaphore;
 CanRxMsg CAN_RxStruct;
-
-void TIM8_UP_TIM13_IRQHandler(void)
-{
-  if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
-    set_left_encoder_value(TIM1->CNT);
-    set_right_encoder_value(TIM3->CNT);
-    //TIM_SetCounter(TIM3, 0);
-    TIM_ClearFlag(TIM8, TIM_FLAG_Update);
-  }
-}
 
 int main(void)
 {

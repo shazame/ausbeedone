@@ -13,6 +13,8 @@
 
 #include <AUSBEE/lidar.h>
 
+#include "encoders.h"
+
 // extern global variables
 //usart
 extern volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
@@ -76,4 +78,15 @@ void CAN1_RX0_IRQHandler(void) {
 	}
 	else if(CAN_GetITStatus(CAN1, CAN_IT_FOV0) == SET) { // Fifo 0 overrun
 	}
+}
+
+// Updating encoder value
+void TIM8_UP_TIM13_IRQHandler(void)
+{
+  if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
+    set_left_encoder_value(TIM1->CNT);
+    set_right_encoder_value(TIM3->CNT);
+    //TIM_SetCounter(TIM3, 0);
+    TIM_ClearFlag(TIM8, TIM_FLAG_Update);
+  }
 }
