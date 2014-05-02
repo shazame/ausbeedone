@@ -46,6 +46,7 @@ void control_system_task(void *data)
     ausbee_cs_update(&(am->csm_left_motor), get_left_encoder_value());
 
     printf("Measure: %"PRId32": 1,", get_right_encoder_value());
+    printf("Reference: %"PRId32": 1,", ausbee_pid_get_ref(&(am->pid_right_motor)));
     printf("Error: %"PRId32": 1,", ausbee_get_pid_error(&(am->pid_right_motor)));
     printf("Error sum: %"PRId32": 0.1,", ausbee_get_pid_error_sum(&(am->pid_right_motor)));
     printf("Command: %"PRId32": 10\r\n", right_motor_command);

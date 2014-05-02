@@ -27,6 +27,8 @@ struct trajectory_manager traj;
 struct asserv_manager am;
 struct ausbee_l298_chip mot_droit, mot_gauche;
 
+int32_t right_motor_ref = 0;
+
 volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
 xSemaphoreHandle USART1ReceiveHandle;
 xSemaphoreHandle CANReceiveSemaphore;
@@ -73,8 +75,6 @@ int main(void) {
 
   vTaskStartScheduler();
 
-  control_system_set_right_motor_ref(&am, 1000);
-
   for(;;) {
 
   }
@@ -88,6 +88,9 @@ void blink1(void) {
 
   for(;;) {
     platform_led_toggle(PLATFORM_LED0);
-    vTaskDelay(10 * portTICK_RATE_MS);
+    control_system_set_right_motor_ref(&am, right_motor_ref);
+    right_motor_ref += 500;
+
+    vTaskDelay(50 * portTICK_RATE_MS);
   }
 }
