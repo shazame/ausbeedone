@@ -6,6 +6,7 @@
 #include "queue.h"
 #include "task.h"
 #include "semphr.h"
+#include "actions.h"
 
 extern xSemaphoreHandle USART1ReceiveHandle;
 
@@ -145,3 +146,44 @@ void init_lidar()
   }
 }
 
+//Fonction utilisée pour initialiser les servos sur servo module à leut position de départ
+void init_servo_position_depart()
+{
+  fermer_bras_gauche();
+  fermer_bras_droit();
+  init_servo_peinture_ausbee();
+  init_servo_peinture_canon();
+  fermer_servo_canon_haut();
+  fermer_servo_canon_bas();
+}
+
+//Fonction pour initialiser les gpio en fonction du robot
+void init_gpio_robot()
+{
+  //Contact canon
+  platform_gpio_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  //tirette
+  platform_gpio_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
+ //couleur départ 
+  platform_gpio_init(GPIO6, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  
+}
+
+//Fonction utilisée pour initialiser le timer chargé de compter les secondes
+//temps_maxi est le temps en seconde jusqu'auquel il compte.
+void init_timer_relais(uint8_t temps_maxi)
+{
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);   // Enable APB1 clock on TIM2
+  TIM_TimeBaseInitTypeDef TimeBaseInit_relais;
+  TIM_TimeBaseStructInit(&TimeBaseInit_relais);  // initialize the struct
+
+  TimeBaseInit_relais.TIM_Prescaler=1000;                    // 168MHz/168Khz
+  TimeBaseInit_relais.TIM_CounterMode = TIM_CounterMode_Up;  // counter mode up
+  TimeBaseInit_relais.TIM_Period = 16800;                    // 
+  TimeBaseInit_relais.TIM_ClockDivision = 0x0000;            // is not used
+  TimeBaseInit_relais.TIM_RepetitionCounter = 0x0000;        // is not used
+
+  TIM_TimeBaseInit(TIM2, &TimeBaseInit_relais);            // Initialize TIM10
+  TIM_Cmd(TIM2, ENABLE);
+
+}
