@@ -34,13 +34,13 @@ uint8_t contact_fresque()
 //Fonction utilisée pour activer la turbine
 void enable_turbine()
 {
-  platform_reset_GPIO(GPIO_ENABLE_TURBINE);
+  platform_GPIO_reset(GPIO_ENABLE_TURBINE);
 }
 
 //Fonction utilisée pour desactiver la turbine
 void disable_turbine()
 {
-  platform_set_GPIO(GPIO_ENABLE_TURBINE);
+  platform_GPIO_set(GPIO_ENABLE_TURBINE);
 }
 
 //Fonction utilisée pour bouger un servo connecté sur servo_module
@@ -106,24 +106,35 @@ void move_servo_from_servo_module(uint8_t servo, uint8_t angle)
 
   mailbox_number = CAN_Transmit(CAN1, &CAN_Tx);
   if(mailbox_number == CAN_TxStatus_NoMailBox)
-    platform_set_led(PLATFORM_LED3);
+    platform_LED_set(PLATFORM_LED3);
   uint8_t transmit_status = CAN_TransmitStatus(CAN1, mailbox_number);
   while(transmit_status!=CAN_TxStatus_Ok){
     transmit_status = CAN_TransmitStatus(CAN1, mailbox_number);
     if(transmit_status == CAN_TxStatus_Ok)
     {
-      platform_set_led(PLATFORM_LED4);
-      platform_reset_led(PLATFORM_LED7);
+      platform_LED_set(PLATFORM_LED4);
+      platform_LED_reset(PLATFORM_LED7);
     }
     else if( transmit_status == CAN_TxStatus_Pending)
     {
-      platform_set_led(PLATFORM_LED7);
+      platform_LED_set(PLATFORM_LED7);
     }
     else
-      platform_set_led(PLATFORM_LED6);
+      platform_LED_set(PLATFORM_LED6);
   }
 
   //vTaskDelay(100);
+}
+
+//Fonction utilisé pour initialiser les servos sur servo module à leut position de départ
+void init_servo_position_depart()
+{
+  fermer_bras_gauche();
+  fermer_bras_droit();
+  init_servo_peinture_ausbee();
+  init_servo_peinture_canon();
+  fermer_servo_canon_haut();
+  fermer_servo_canon_bas();
 }
 
 //Fonctions utilitaire pour bouger les servos a des positions fixes
@@ -167,6 +178,26 @@ void placer_peinture_canon()
   move_servo_from_servo_module(SERVO_PEINTURE_CANON, SERVO_PEINTURE_CANON_POSITION_OUVERTE);
 }
 
+void ouvrir_servo_canon_haut()
+{
+  move_servo_from_servo_module(SERVO_CANON_HAUT,SERVO_CANON_HAUT_POSITION_OUVERTE);
+}
+
+void fermer_servo_canon_haut()
+{
+  move_servo_from_servo_module(SERVO_CANON_BAS_POSITION_FERMEE,SERVO_CANON_HAUT_POSITION_FERMEE);
+}
+
+void ouvrir_servo_canon_bas()
+{
+  move_servo_from_servo_module(SERVO_CANON_BAS, SERVO_CANON_BAS_POSITION_OUVERTE);
+}
+
+void fermer_servo_canon_bas()
+{
+  move_servo_from_servo_module(SERVO_CANON_BAS, SERVO_CANON_BAS_POSITION_FERMEE);
+}
+
 //Lance une balle
 //Necessite d'activer la turbine 10 secondes avant
 //séquence: ouvre servo bas
@@ -175,13 +206,13 @@ void placer_peinture_canon()
 //          ferme servo haut
 void lancer_une_balle()
 {
-  move_servo_from_servo_module(SERVO_CANON_BAS, SERVO_CANON_BAS_POSITION_OUVERTE);
+  ouvrir_servo_canon_bas();
   vTaskDelay(60);
-  move_servo_from_servo_module(SERVO_CANON_BAS, SERVO_CANON_BAS_POSITION_FERMEE);
+  fermer_servo_canon_bas();
   vTaskDelay(60);
-  move_servo_from_servo_module(SERVO_CANON_HAUT,SERVO_CANON_HAUT_POSITION_OUVERTE);
+  ouvrir_servo_canon_haut();
   vTaskDelay(60);
-  move_servo_from_servo_module(SERVO_CANON_HAUT,SERVO_CANON_HAUT_POSITION_FERMEE);
+  fermer_servo_canon_haut();
   vTaskDelay(60);
 }
 
