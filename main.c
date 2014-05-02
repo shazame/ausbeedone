@@ -25,7 +25,7 @@ void blink1();
 void run_motors();
 // Global variables
 struct asserv_manager am;
-struct ausbee_l298_chip mot_droit, mot_gauche;
+struct ausbee_l298_chip right_mot, left_mot;
 
 int32_t right_motor_ref = 0;
 int32_t left_motor_ref = 0;
@@ -45,7 +45,8 @@ void TIM8_UP_TIM13_IRQHandler(void)
   }
 }
 
-int main(void) {
+int main(void)
+{
   // Call the platform initialization function
   platform_hse_pll_init();
   platform_usart_init(USART_DEBUG, 115200);
@@ -63,10 +64,10 @@ int main(void) {
   ausbee_encoder_init_timer(TIM3);
 
   // Init motors
-  init_mot(&mot_droit, &mot_gauche);
+  init_mot(&right_mot, &left_mot);
 
   // Init trajectory manager
-  motors_wrapper_init(&mot_droit, &mot_gauche);
+  motors_wrapper_init(&right_mot, &left_mot);
 
   // Launching control system
   start_control_system(&am);
@@ -84,10 +85,8 @@ int main(void) {
   return 0;
 }
 
-void blink1(void) {
-  /* Block for 500ms. */
-  //const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
-
+void blink1(void)
+{
   for(;;) {
     platform_led_toggle(PLATFORM_LED0);
 
@@ -95,7 +94,8 @@ void blink1(void) {
   }
 }
 
-void run_motors(void) {
+void run_motors(void)
+{
   for(;;) {
     control_system_set_right_motor_ref(&am, right_motor_ref);
     right_motor_ref += 500;
