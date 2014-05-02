@@ -12,7 +12,7 @@
 // 0 Si elle est absente
 uint8_t presence_tirette(void)
 {
- return (platform_GPIO_get_value(GPIO_TIRETTE));
+ return (platform_gpio_get_value(GPIO_TIRETTE));
 }
 
 //Fonction utilisé pour tester la couleur du camp de départ
@@ -20,7 +20,7 @@ uint8_t presence_tirette(void)
 //Retourne COULEUR_ROUGE si la couleur est Rouge // A vérifié
 uint8_t couleur_depart()
 {
-  return (platform_GPIO_get_value(GPIO_SELECTION_COULEUR));
+  return (platform_gpio_get_value(GPIO_SELECTION_COULEUR));
 }
 
 //Fonction utilisée pour tester si le capteur à contact en bout de canon est actif ou non
@@ -28,19 +28,19 @@ uint8_t couleur_depart()
 //retourne 0 sinon
 uint8_t contact_fresque()
 {
-  return (platform_GPIO_get_value(GPIO_CONTACT_CANON));
+  return (platform_gpio_get_value(GPIO_CONTACT_CANON));
 }
 
 //Fonction utilisée pour activer la turbine
 void enable_turbine()
 {
-  platform_GPIO_reset(GPIO_ENABLE_TURBINE);
+  platform_gpio_reset(GPIO_ENABLE_TURBINE);
 }
 
 //Fonction utilisée pour desactiver la turbine
 void disable_turbine()
 {
-  platform_GPIO_set(GPIO_ENABLE_TURBINE);
+  platform_gpio_set(GPIO_ENABLE_TURBINE);
 }
 
 //Fonction utilisée pour bouger un servo connecté sur servo_module
@@ -106,21 +106,21 @@ void move_servo_from_servo_module(uint8_t servo, uint8_t angle)
 
   mailbox_number = CAN_Transmit(CAN1, &CAN_Tx);
   if(mailbox_number == CAN_TxStatus_NoMailBox)
-    platform_LED_set(PLATFORM_LED3);
+    platform_led_set(PLATFORM_LED3);
   uint8_t transmit_status = CAN_TransmitStatus(CAN1, mailbox_number);
   while(transmit_status!=CAN_TxStatus_Ok){
     transmit_status = CAN_TransmitStatus(CAN1, mailbox_number);
     if(transmit_status == CAN_TxStatus_Ok)
     {
-      platform_LED_set(PLATFORM_LED4);
-      platform_LED_reset(PLATFORM_LED7);
+      platform_led_set(PLATFORM_LED4);
+      platform_led_reset(PLATFORM_LED7);
     }
     else if( transmit_status == CAN_TxStatus_Pending)
     {
-      platform_LED_set(PLATFORM_LED7);
+      platform_led_set(PLATFORM_LED7);
     }
     else
-      platform_LED_set(PLATFORM_LED6);
+      platform_led_set(PLATFORM_LED6);
   }
 
   //vTaskDelay(100);
