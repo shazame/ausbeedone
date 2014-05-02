@@ -3,7 +3,8 @@
 
 #include <AUSBEE/control_system_manager.h>
 #include <AUSBEE/pid.h>
-#include "trajectory_manager.h"
+
+#include "utils/motors_wrapper.h"
 
 struct asserv_manager {
   struct ausbee_cs csm_right_motor;
@@ -13,7 +14,7 @@ struct asserv_manager {
   struct ausbee_pid pid_left_motor;
 };
 
-void start_control_system(struct asserv_manager *, struct trajectory_manager *);
+void start_control_system(struct asserv_manager *, struct motors_wrapper *);
 
 void control_system_set_right_motor_ref(struct asserv_manager *am, int32_t ref);
 

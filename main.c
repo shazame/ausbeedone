@@ -17,15 +17,16 @@
 
 #include "utils/init.h"
 #include "utils/encoders.h"
+#include "utils/motors_wrapper.h"
 #include "asserv_manager.h"
-#include "trajectory_manager.h"
 
 // Private function prototypes
 void blink1();
+void run_motors();
 // Global variables
-struct trajectory_manager traj;
 struct asserv_manager am;
 struct ausbee_l298_chip mot_droit, mot_gauche;
+struct motors_wrapper mots_wrap;
 
 int32_t right_motor_ref = 0;
 
@@ -65,13 +66,14 @@ int main(void) {
   init_mot(&mot_droit, &mot_gauche);
 
   // Init trajectory manager
-  set_motors(&traj, &mot_droit, &mot_gauche);
+  motors_wrapper_init(&mots_wrap, &mot_droit, &mot_gauche);
 
   // Launching control system
-  start_control_system(&am, &traj);
+  start_control_system(&am, &mots_wrap);
   // TODO: passer la main au traj manager
 
-  xTaskCreate(blink1, (const signed char *)"LED1", 340, NULL, 1, NULL );
+  xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
+  xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );
 
   vTaskStartScheduler();
 
@@ -88,6 +90,13 @@ void blink1(void) {
 
   for(;;) {
     platform_led_toggle(PLATFORM_LED0);
+
+    vTaskDelay(10 * portTICK_RATE_MS);
+  }
+}
+
+void run_motors(void) {
+  for(;;) {
     control_system_set_right_motor_ref(&am, right_motor_ref);
     right_motor_ref += 500;
 
