@@ -7,10 +7,10 @@ struct encoders {
   int32_t right_value, left_value;
 };
 
-void set_right_encoder_value(int32_t);
-void set_left_encoder_value (int32_t);
+void encoders_set_right_value(int32_t);
+void encoders_set_left_value (int32_t);
 
-int32_t get_right_encoder_value(void);
-int32_t get_left_encoder_value (void);
+int32_t encoders_get_right_value(void);
+int32_t encoders_get_left_value (void);
 
 #endif /* ENCODERS_UTILS_H */

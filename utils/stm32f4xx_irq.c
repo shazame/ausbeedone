@@ -84,8 +84,8 @@ void CAN1_RX0_IRQHandler(void) {
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
-    set_left_encoder_value(TIM1->CNT);
-    set_right_encoder_value(TIM3->CNT);
+    encoders_set_left_value(TIM1->CNT);
+    encoders_set_right_value(TIM3->CNT);
     //TIM_SetCounter(TIM3, 0);
     TIM_ClearFlag(TIM8, TIM_FLAG_Update);
   }

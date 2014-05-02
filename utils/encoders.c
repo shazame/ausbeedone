@@ -2,21 +2,21 @@
 
 struct encoders enc = { 0, 0 };
 
-void set_right_encoder_value(int32_t val)
+void encoders_set_right_value(int32_t val)
 {
   enc.right_value = val;
 }
-void set_left_encoder_value (int32_t val)
+void encoders_set_left_value (int32_t val)
 {
   enc.left_value = val;
 }
 
-int32_t get_right_encoder_value(void)
+int32_t encoders_get_right_value(void)
 {
   return enc.right_value;
 }
 
-int32_t get_left_encoder_value (void)
+int32_t encoders_get_left_value (void)
 {
   return enc.left_value;
 }
