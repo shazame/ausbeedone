@@ -15,4 +15,6 @@ struct asserv_manager {
 
 void start_control_system(struct asserv_manager *, struct trajectory_manager *);
 
+void control_system_set_right_motor_ref(struct asserv_manager *am, int32_t ref);
+
 #endif /* ASSERV_MANAGER_H */

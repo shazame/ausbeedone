@@ -71,6 +71,8 @@ int main(void) {
 
   vTaskStartScheduler();
 
+  control_system_set_right_motor_ref(&am, 1000);
+
   for(;;) {
 
   }
