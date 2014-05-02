@@ -28,6 +28,7 @@ struct asserv_manager am;
 struct ausbee_l298_chip mot_droit, mot_gauche;
 
 int32_t right_motor_ref = 0;
+int32_t left_motor_ref = 0;
 
 volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
 xSemaphoreHandle USART1ReceiveHandle;
@@ -98,6 +99,9 @@ void run_motors(void) {
   for(;;) {
     control_system_set_right_motor_ref(&am, right_motor_ref);
     right_motor_ref += 500;
+
+    control_system_set_left_motor_ref(&am, left_motor_ref);
+    left_motor_ref += 300;
 
     vTaskDelay(50 * portTICK_RATE_MS);
   }
