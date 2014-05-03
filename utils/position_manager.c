@@ -1,7 +1,7 @@
 #include "position_manager.h"
 
 struct position_manager {
-  uint32_t tick_per_cm; // Number of ticks per cm
+  uint32_t tick_per_m; // Number of ticks per cm
 
   int32_t left_encoder, right_encoder;
   int32_t distance; // In cm
@@ -10,7 +10,7 @@ struct position_manager {
 
 void position_init(void)
 {
-  pm.tick_per_cm = 0;
+  pm.tick_per_m = 0;
 
   pm.left_encoder = 0;
   pm.right_encoder = 0;
@@ -24,12 +24,14 @@ void position_update(int32_t left_enc, int32_t right_enc)
   pm.left_encoder = left_enc;
   pm.right_encoder = right_enc;
 
-  // TODO: compute distance and everything
+  pm.distance = (pm.left_encoder + pm.right_encoder) * 100 / (2 * pm.tick_per_m);
+
+  // TODO: update angle and other things
 }
 
-void position_set_tick_per_cm(uint32_t tick_per_cm)
+void position_set_tick_per_meter(uint32_t tick_per_m)
 {
-  pm.tick_per_cm = tick_per_cm;
+  pm.tick_per_m = tick_per_m;
 }
 
 int32_t position_get_left_encoder(void)
