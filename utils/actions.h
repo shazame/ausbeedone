@@ -18,8 +18,6 @@ void disable_turbine();
 
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
 
-void init_servo_position_depart();
-
 void ouvrir_bras_gauche();
 void fermer_bras_gauche();
 
