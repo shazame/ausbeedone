@@ -43,7 +43,7 @@ int main(void) {
   // Call the platform initialization function
   platform_hse_pll_init();
   platform_usart_init(USART_DEBUG, 115200);
-  platform_usart_init(USART1,115200);
+  //platform_usart_init(USART1,115200);
   platform_led_init();
   platform_can_init(CAN1);
   init_can();
@@ -51,13 +51,13 @@ int main(void) {
   //init_lidar();
   //init_usart_interrupt();
   //init_servo();
-  //init_mot(&mot_gauche, &mot_droit);
+  init_mot(&mot_gauche, &mot_droit);
   init_gpio_robot();
   init_servo_position_depart();
   xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
   //xTaskCreate(move_zqsd, (const signed char *)"MOVE", 400, NULL, 1, NULL );
   xTaskCreate(blink_led, (const signed char*)"BLINK_LED",350,NULL,1,NULL);
-  xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
+  //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
   vTaskStartScheduler();
 
   for(;;) {
@@ -89,12 +89,13 @@ void turbine()
 
 void test()
 {
-  while(1)
-  {
-    while(contact_fresque()!=1)
-      ;
-    lancer_une_balle();
-  }
+  //asserv_tempo();
+  //while(1)
+  //{
+  //  while(contact_fresque()!=1)
+  //    ;
+  //  lancer_une_balle();
+  //}
   //lidar_detect_in_circle();
   //test_lidar();
   //while(1);
@@ -105,18 +106,18 @@ void test()
     ;
   */
   //asserv_tempo();
-  //char cool;
-  //uint8_t angle=40;
-  //while(1)
-  //{
-  //  cool=getchar();
-  //  if (cool=='+')
-  //    angle++;
-  //  else
-  //    angle--;
-  //  //scanf("angle :%d", &cool);
-  //  move_servo_from_servo_module(SERVO_CANON_BAS, angle);
-  //}
+ char cool;
+ uint8_t angle=40;
+ while(1)
+ {
+   cool=getchar();
+   if (cool=='+')
+     angle++;
+   else
+     angle--;
+   //scanf("angle :%d", &cool);
+   move_servo_from_servo_module(SERVO_BRAS_GAUCHE, angle);
+ }
   //while(1);
   uint8_t value;
   platform_gpio_init(GPIO6, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
@@ -140,17 +141,11 @@ void test()
 
 void asserv_tempo()
 {
-  move_servo_from_servo_module(SERVO_CANON_BAS,79);
-  move_servo_from_servo_module(SERVO_CANON_HAUT,24);
-  move_servo_from_servo_module(SERVO_PEINTURE_COTE_AUSBEE,52);
-  move_servo_from_servo_module(SERVO_PEINTURE_CANON,40);
-  move_servo_from_servo_module(SERVO_BRAS_GAUCHE,12);
-  move_servo_from_servo_module(SERVO_BRAS_DROITE,91);
-  platform_gpio_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
-  platform_gpio_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
-  while(platform_gpio_get_value(GPIO8))
+  init_servo_position_depart();
+  init_gpio_robot(); 
+  while(presence_tirette())
     ;
-  platform_gpio_reset(GPIO1);
+  enable_turbine();
   ausbee_l298_set_duty_cycle(mot_gauche,60);
   ausbee_l298_set_duty_cycle(mot_droit,60);
   vTaskDelay(80);
