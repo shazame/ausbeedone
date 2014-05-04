@@ -161,29 +161,32 @@ void init_servo_position_depart()
 void init_gpio_robot()
 {
   //Contact canon
-  platform_gpio_init(GPIO9, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_gpio_init(GPIO_ENABLE_TURBINE, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
   //tirette
-  platform_gpio_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
+  platform_gpio_init(GPIO_TIRETTE, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
  //couleur départ 
-  platform_gpio_init(GPIO6, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
-  
+  platform_gpio_init(GPIO_SELECTION_COULEUR, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  //Relais
+  platform_gpio_init(GPIO_RELAIS, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
 }
 
 //Fonction utilisée pour initialiser le timer chargé de compter les secondes
-//temps_maxi est le temps en seconde jusqu'auquel il compte.
-void init_timer_relais(uint8_t temps_maxi)
+//Compteur initialisé pour compter une seconde
+void init_timer_relais()
 {
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);   // Enable APB1 clock on TIM2
   TIM_TimeBaseInitTypeDef TimeBaseInit_relais;
   TIM_TimeBaseStructInit(&TimeBaseInit_relais);  // initialize the struct
 
-  TimeBaseInit_relais.TIM_Prescaler=1000;                    // 168MHz/168Khz
+  TimeBaseInit_relais.TIM_Prescaler=10000;                    // 168MHz/168Khz
   TimeBaseInit_relais.TIM_CounterMode = TIM_CounterMode_Up;  // counter mode up
-  TimeBaseInit_relais.TIM_Period = 16800;                    // 
+  TimeBaseInit_relais.TIM_Period = 16800;                    // To count 1 second 
   TimeBaseInit_relais.TIM_ClockDivision = 0x0000;            // is not used
   TimeBaseInit_relais.TIM_RepetitionCounter = 0x0000;        // is not used
 
-  TIM_TimeBaseInit(TIM2, &TimeBaseInit_relais);            // Initialize TIM10
+  TIM_TimeBaseInit(TIM2, &TimeBaseInit_relais);            // Initialize TIM2
+  NVIC_EnableIRQ(TIM2_IRQn);
+  TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
   TIM_Cmd(TIM2, ENABLE);
 
 }
