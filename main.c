@@ -62,15 +62,16 @@ int main(void)
   // Setting up position manager
   position_init();
   position_set_tick_per_meter(1170);
+  position_set_axle_track_mm(235);
 
   // Launching control system
   start_control_system(&am);
-  // TODO: passer la main au traj manager
 
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
   //xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );
 
   control_system_set_right_motor_ref(&am, 1000);
+  control_system_set_left_motor_ref(&am, 1000);
 
   vTaskStartScheduler();
 

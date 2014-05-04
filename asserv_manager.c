@@ -58,8 +58,8 @@ void control_system_task(void *data)
     printf("Left Error sum: %"PRId32": 0.1,"   , ausbee_get_pid_error_sum(&(am->pid_left_motor)));
     printf("Left Command:   %"PRId32": 10\r\n" , left_motor_command);
 
-    printf("Robot Distance: %"PRId32": 1,"     , position_get_distance());
-    printf("Robot Angle:    %"PRId32": 1\r\n"  , position_get_angle());
+    printf("Robot Distance: %"PRId32": 1,"     , position_get_distance_mm());
+    printf("Robot Angle:    %"PRId32": 1\r\n"  , position_get_angle_deg());
 
     vTaskDelay(1 * portTICK_RATE_MS); // 1 * 100 ms
   }
