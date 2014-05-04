@@ -43,6 +43,18 @@ void disable_turbine()
   platform_gpio_set(GPIO_ENABLE_TURBINE);
 }
 
+//Fonction utilisée pour désactiver la puissance (relais)
+void enable_power_relay(void)
+{
+  platform_gpio_set(GPIO_RELAIS);
+}
+
+//Fonction utilisée pour activer la puissance (relais)
+void disable_power_relay(void)
+{
+  platform_gpio_reset(GPIO_RELAIS);
+}
+
 //Fonction utilisée pour bouger un servo connecté sur servo_module
 //servo peut-etre un des 8 servos définis dans define.h
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle)
