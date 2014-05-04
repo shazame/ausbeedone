@@ -77,3 +77,23 @@ void CAN1_RX0_IRQHandler(void) {
 	else if(CAN_GetITStatus(CAN1, CAN_IT_FOV0) == SET) { // Fifo 0 overrun
 	}
 }
+
+// Updating encoder value
+//void TIM8_UP_TIM13_IRQHandler(void)
+//{
+//  if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
+//    //position_update(TIM1->CNT, TIM3->CNT);
+//    //TIM_SetCounter(TIM3, 0);
+//    //TIM_ClearFlag(TIM8, TIM_FLAG_Update);
+//  }
+//}
+
+// Count one second
+void TIM2_IRQHandler(void)
+{
+  if(TIM_GetITStatus(TIM2,TIM_IT_Update) == SET)
+  {
+    platform_led_toggle(PLATFORM_LED7);
+    TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+  }
+}
