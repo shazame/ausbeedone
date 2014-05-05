@@ -25,10 +25,10 @@ void position_init(void)
   pm.angle_deg = 0;
 }
 
-void position_update(int32_t left_enc, int32_t right_enc)
+void position_update(int32_t left_enc_diff, int32_t right_enc_diff)
 {
-  pm.left_encoder = left_enc;
-  pm.right_encoder = right_enc;
+  pm.left_encoder += left_enc_diff;
+  pm.right_encoder += right_enc_diff;
 
   int32_t distance_ticks = (pm.left_encoder + pm.right_encoder) / 2;
   pm.distance_mm = position_ticks_to_mm(distance_ticks);

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 void position_init(void);
-void position_update(int32_t left_enc, int32_t right_enc);
+void position_update(int32_t left_enc_diff, int32_t right_enc_diff);
 
 void position_set_tick_per_meter(uint32_t tick_per_cm);
 void position_set_axle_track_mm(uint32_t d);
