@@ -28,9 +28,11 @@ void asserv_tempo();
 void foutre_les_fresque();
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
 void lidar_detect_in_circle();
+void relay_counter();
 
 volatile struct ausbee_lidar_data data[AUSBEE_LIDAR_PICCOLO_DATA_LENGTH];
 volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
+volatile uint8_t elapsed_time=0;
 xSemaphoreHandle USART1ReceiveHandle;
 xSemaphoreHandle CANReceiveSemaphore;
 CanRxMsg CAN_RxStruct;
@@ -53,12 +55,13 @@ int main(void) {
   //init_usart_interrupt();
   //init_servo();
   //init_mot(&mot_gauche, &mot_droit);
-  //init_gpio_robot();
+  init_gpio_robot();
   //init_servo_position_depart();
   //xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
   //xTaskCreate(move_zqsd, (const signed char *)"MOVE", 400, NULL, 1, NULL );
-  xTaskCreate(blink_led, (const signed char*)"BLINK_LED",350,NULL,1,NULL);
+  xTaskCreate(blink_led, (const signed char*)"BLINK_LED",100,NULL,1,NULL);
   //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
+  xTaskCreate(relay_counter, (const signed char*)"RELAY",100,NULL,1,NULL);
   vTaskStartScheduler();
 
   for(;;) {
@@ -76,6 +79,24 @@ void blink_led()
     platform_led_toggle(PLATFORM_LED0);
   }
 }
+
+void relay_counter()
+{
+  while(contact_fresque()!=1)
+    ;
+  elapsed_time=0;
+  platform_led_set(PLATFORM_LED1);
+  while(1)
+  {
+    if (elapsed_time>=88)
+    {
+      //shutdown power
+      disable_power_relay();
+      platform_led_set(PLATFORM_LED6);
+    }
+  }
+}
+
 
 void turbine()
 {
