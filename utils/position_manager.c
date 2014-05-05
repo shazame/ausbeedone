@@ -12,7 +12,7 @@ struct position_manager {
   int32_t angle_deg;
 } pm;
 
-int32_t position_ticks_to_mm(uint32_t value_ticks);
+#define position_ticks_to_mm(value_ticks) (value_ticks * 1000 / pm.tick_per_m)
 
 void position_init(void)
 {
@@ -37,11 +37,6 @@ void position_update(int32_t left_enc_diff, int32_t right_enc_diff)
   pm.angle_deg = atan2(wheel_distance_diff_mm, pm.axle_track_mm) * 180 / PI;
 
   // TODO: compute x and y
-}
-
-int32_t position_ticks_to_mm(uint32_t value_ticks)
-{
-  return value_ticks * 1000 / pm.tick_per_m;
 }
 
 void position_set_tick_per_meter(uint32_t tick_per_m)
