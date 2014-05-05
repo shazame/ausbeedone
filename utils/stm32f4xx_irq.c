@@ -20,6 +20,7 @@ extern xSemaphoreHandle USART1ReceiveHandle;
 //CAN
 extern xSemaphoreHandle CANReceiveSemaphore;
 extern CanRxMsg CAN_RxStruct;
+extern volatile uint8_t elapsed_time;
 
 void USART1_IRQHandler(void)
 {
@@ -93,6 +94,7 @@ void TIM2_IRQHandler(void)
 {
   if(TIM_GetITStatus(TIM2,TIM_IT_Update) == SET)
   {
+    elapsed_time++;
     platform_led_toggle(PLATFORM_LED7);
     TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   }
