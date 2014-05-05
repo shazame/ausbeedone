@@ -12,7 +12,7 @@ struct position_manager {
   int32_t angle_deg;
 } pm;
 
-#define position_ticks_to_mm(value_ticks) (value_ticks * 1000 / pm.tick_per_m)
+#define position_ticks_to_mm(value_ticks) ((value_ticks) * 1000.0L / pm.tick_per_m)
 
 void position_init(void)
 {
