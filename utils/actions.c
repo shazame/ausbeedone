@@ -46,13 +46,13 @@ void disable_turbine()
 //Fonction utilisée pour désactiver la puissance (relais)
 void enable_power_relay(void)
 {
-  platform_gpio_set(GPIO_RELAIS);
+  platform_gpio_reset(GPIO_RELAIS);
 }
 
 //Fonction utilisée pour activer la puissance (relais)
 void disable_power_relay(void)
 {
-  platform_gpio_reset(GPIO_RELAIS);
+  platform_gpio_set(GPIO_RELAIS);
 }
 
 //Fonction utilisée pour bouger un servo connecté sur servo_module
