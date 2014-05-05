@@ -21,8 +21,8 @@ struct asserv_manager am;
 
 void start_control_system(struct asserv_manager *am)
 {
-  ausbee_init_pid(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd, 100, 0);
-  ausbee_init_pid(&(am->pid_left_motor), PID_Kp, PID_Ki, PID_Kd, 100, 0);
+  ausbee_init_pid(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd, 50, 0);
+  ausbee_init_pid(&(am->pid_left_motor), PID_Kp, PID_Ki, PID_Kd, 50, 0);
 
   // Initialise each control system manager
   ausbee_cs_init(&(am->csm_right_motor));
@@ -58,8 +58,12 @@ void control_system_task(void *data)
     printf("Left Error sum: %"PRId32": 0.1;"   , ausbee_get_pid_error_sum(&(am->pid_left_motor)));
     printf("Left Command:   %"PRId32": 10\r\n" , left_motor_command);
 
-    printf("Robot Distance: %"PRId32": 1;"     , position_get_distance_mm());
-    printf("Robot Angle:    %"PRId32": 1\r\n"  , position_get_angle_deg());
+    printf("Robot Distance:               %lf: 1;"   , position_get_distance_mm());
+    printf("Robot Enc diff:               %lf: 1;"   , position_get_enc_diff_mm());
+    printf("Robot Enc diff by axle track: %lf: 1;"   , position_get_enc_diff_by_axle_track());
+    printf("Robot Angle diff deg:         %lf: 10;"  , position_get_angle_diff_deg());
+    printf("Robot Angle diff rad:         %lf: 10;"  , position_get_angle_diff_rad());
+    printf("Robot Angle:                  %lf: 1\r\n", position_get_angle_deg());
 
     vTaskDelay(1 * portTICK_RATE_MS); // 1 * 100 ms
   }
