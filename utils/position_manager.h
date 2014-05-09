@@ -11,11 +11,10 @@ void position_set_axle_track_mm(uint32_t d);
 
 int32_t position_get_left_encoder(void);
 int32_t position_get_right_encoder(void);
-double  position_get_distance_mm(void);
-double  position_get_enc_diff_mm(void);
-double  position_get_enc_diff_by_axle_track(void);
-double  position_get_angle_diff_rad(void);
-double  position_get_angle_diff_deg(void);
-double  position_get_angle_deg(void);
+
+float position_get_distance_mm(void);
+float position_get_angle_deg(void);
+float position_get_x_mm(void);
+float position_get_y_mm(void);
 
 #endif /* POSITION_MANAGER_H */

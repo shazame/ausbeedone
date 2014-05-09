@@ -72,8 +72,8 @@ int main(void)
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
   //xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );
 
-  control_system_set_right_motor_ref(&am, 500);
-  control_system_set_left_motor_ref(&am, 0);
+  control_system_set_right_motor_ref(&am, 1000);
+  control_system_set_left_motor_ref(&am, 1000);
 
   vTaskStartScheduler();
 
@@ -93,14 +93,25 @@ void blink1(void)
   }
 }
 
+#define NB_POINTS 4
 void run_motors(void)
 {
-  for(;;) {
-    control_system_set_right_motor_ref(&am, right_motor_ref);
-    right_motor_ref += 500;
+  int32_t traj[NB_POINTS][2] = {
+    {20, 20},
+    {216, -216},
+    {40, 40},
+    {0, 432}
+  };
 
+  int i = 0;
+  for(;; i++) {
+    control_system_set_right_motor_ref(&am, right_motor_ref);
     control_system_set_left_motor_ref(&am, left_motor_ref);
-    left_motor_ref += 300;
+
+    if (i < NB_POINTS) {
+      left_motor_ref  += traj[i][0];
+      right_motor_ref += traj[i][1];
+    }
 
     vTaskDelay(50 * portTICK_RATE_MS);
   }
