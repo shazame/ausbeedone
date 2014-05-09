@@ -45,21 +45,21 @@ int main(void)
   // Encoder setup
   ausbee_init_sampling_timer(TIM8, 16800, 1000);
 
-  // Left encoder
+  // Right encoder
   platform_encoder1_init();
   ausbee_encoder_clock_enable(TIM1);
   ausbee_encoder_init_timer(TIM1);
 
-  // Right encoder
+  // Left encoder
   platform_encoder2_init();
   ausbee_encoder_clock_enable(TIM3);
   ausbee_encoder_init_timer(TIM3);
 
   // Init motors
-  init_mot(&right_mot, &left_mot);
+  init_mot(&left_mot, &right_mot);
 
   // Init motors_wrapper
-  motors_wrapper_init(&right_mot, &left_mot);
+  motors_wrapper_init(&left_mot, &right_mot);
 
   // Setting up position manager
   position_init();

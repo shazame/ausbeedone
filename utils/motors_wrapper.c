@@ -12,11 +12,11 @@
 
 struct motors_wrapper mots = {NULL, NULL};
 
-void motors_wrapper_init(struct ausbee_l298_chip *right_motor,
-                         struct ausbee_l298_chip *left_motor)
+void motors_wrapper_init(struct ausbee_l298_chip *left_motor,
+                         struct ausbee_l298_chip *right_motor)
 {
-  mots.right_motor = right_motor;
   mots.left_motor  = left_motor;
+  mots.right_motor = right_motor;
 }
 
 void motors_wrapper_right_motor_set_duty_cycle(void *UNUSED(dummy), int32_t duty_cycle)

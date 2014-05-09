@@ -84,7 +84,7 @@ void CAN1_RX0_IRQHandler(void) {
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
-    position_update(TIM1->CNT, TIM3->CNT);
+    position_update(TIM3->CNT, TIM1->CNT);
     TIM_SetCounter(TIM1, 0);
     TIM_SetCounter(TIM3, 0);
     TIM_ClearFlag(TIM8, TIM_FLAG_Update);
