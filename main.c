@@ -47,10 +47,12 @@ int main(void)
 
   // Left encoder
   platform_encoder1_init();
+  ausbee_encoder_clock_enable(TIM1);
   ausbee_encoder_init_timer(TIM1);
 
   // Right encoder
   platform_encoder2_init();
+  ausbee_encoder_clock_enable(TIM3);
   ausbee_encoder_init_timer(TIM3);
 
   // Init motors
