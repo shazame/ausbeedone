@@ -70,10 +70,10 @@ int main(void)
   start_control_system(&am);
 
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
-  //xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );
+  xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );
 
-  control_system_set_right_motor_ref(&am, 1000);
-  control_system_set_left_motor_ref(&am, 1000);
+  //control_system_set_right_motor_ref(&am, 1000);
+  //control_system_set_left_motor_ref(&am, 1000);
 
   vTaskStartScheduler();
 
@@ -97,9 +97,9 @@ void blink1(void)
 void run_motors(void)
 {
   int32_t traj[NB_POINTS][2] = {
-    {20, 20},
-    {216, -216},
-    {40, 40},
+    {200, 200},
+    {216, 0},
+    {50, 80},
     {0, 432}
   };
 

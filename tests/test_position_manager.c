@@ -2,12 +2,48 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#define NB_POINTS 4
+#define NB_POINTS 40
 int32_t traj[NB_POINTS][2] = {
-  {20, 20},
-  {216, -216},
   {40, 40},
-  {0, 432}
+  {40, 40},
+  {40, 40},
+  {40, 40},
+  {40, 40},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {41, -41},
+  {50, 50},
+  {50, 50},
+  {50, 50},
+  {50, 50},
+  {50, 50},
+  {0, 83},
+  {0, 83},
+  {0, 83},
+  {0, 83},
+  {0, 83},
+  {0, 43},
+  {0, 43},
+  {0, 43},
+  {0, 43},
+  {0, 43},
+  {80, 30},
+  {80, 30},
+  {80, 30},
+  {80, 30},
+  {80, 30},
+  {50, 20},
+  {50, 20},
+  {50, 20},
+  {50, 20},
+  {50, 20}
 };
 
 int main(void)
@@ -20,10 +56,14 @@ int main(void)
   for (i = 0; i < NB_POINTS; i++) {
     position_update(traj[i][0], traj[i][1]);
 
-    printf("Robot Distance mm: %f\n"  , position_get_distance_mm());
-    printf("Robot Angle:       %f\n", position_get_angle_deg());
-    printf("Robot x mm:        %f\n"  , position_get_x_mm());
-    printf("Robot y mm:        %f\n\n", position_get_y_mm());
+    printf("Right: 0: 1\n");
+    printf("Left:  0: 1\n");
+
+    printf("Odometry Distance mm: %f: 1;"   , position_get_distance_mm());
+    printf("Odometry Angle:       %f: 1\r\n", position_get_angle_deg());
+
+    printf("Robot x mm: %f;"   , position_get_x_mm());
+    printf("Robot y mm: %f\r\n", position_get_y_mm());
   }
 
   return 0;
