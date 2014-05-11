@@ -10,6 +10,15 @@
 #include <math.h>
 #include <stdio.h>
 
+#ifdef UNUSED
+#elif defined(__GNUC__)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ x
+#else
+# define UNUSED(x) x
+#endif
+
 #define PI 3.1415926535
 
 struct position_manager {
@@ -91,12 +100,12 @@ void position_set_axle_track_mm(uint32_t d)
   pm.axle_track_mm = d;
 }
 
-int32_t position_get_left_encoder(void)
+int32_t position_get_left_encoder(void *UNUSED(dummy))
 {
   return pm.left_encoder;
 }
 
-int32_t position_get_right_encoder(void)
+int32_t position_get_right_encoder(void *UNUSED(dummy))
 {
   return pm.right_encoder;
 }

@@ -1,7 +1,7 @@
 /**
  * @file    asserv_manager.c
  * @author  David BITONNEAU <david.bitonneau@gmail.com>
- * @version V1.0
+ * @version V1.1
  * @date    11-Mar-2014
  * @brief   A controller system for a two-wheeled with encoders.
  *          Implementation file.
@@ -37,6 +37,9 @@ void start_control_system(struct asserv_manager *am)
   ausbee_cs_init(&(am->csm_right_motor));
   ausbee_cs_init(&(am->csm_left_motor));
 
+  ausbee_cs_set_measure_fetcher(&(am->csm_right_motor), position_get_right_encoder, NULL);
+  ausbee_cs_set_measure_fetcher(&(am->csm_left_motor), position_get_left_encoder, NULL);
+
   // We use a pid controller because we like it here at Eirbot
   ausbee_cs_set_controller(&(am->csm_right_motor), ausbee_eval_pid, (void*)&(am->pid_right_motor));
   ausbee_cs_set_controller(&(am->csm_left_motor), ausbee_eval_pid, (void*)&(am->pid_left_motor));
@@ -52,20 +55,20 @@ void control_system_task(void *data)
   for (;;) {
     struct asserv_manager *am = (struct asserv_manager *)data;
 
-    int32_t right_motor_command = ausbee_cs_update(&(am->csm_right_motor), position_get_right_encoder());
-    int32_t left_motor_command = ausbee_cs_update(&(am->csm_left_motor), position_get_left_encoder());
+    ausbee_cs_manage(&(am->csm_right_motor));
+    ausbee_cs_manage(&(am->csm_left_motor));
 
-    printf("Right Measure:   %"PRId32": 1;"    , position_get_right_encoder());
-    printf("Right Reference: %"PRId32": 1;"    , ausbee_pid_get_ref(&(am->pid_right_motor)));
-    printf("Right Error:     %"PRId32": 1;"    , ausbee_get_pid_error(&(am->pid_right_motor)));
+    printf("Right Measure:   %"PRId32": 1;"    , ausbee_cs_get_measure(&(am->csm_right_motor)));
+    printf("Right Reference: %"PRId32": 1;"    , ausbee_cs_get_reference(&(am->csm_right_motor)));
+    printf("Right Error:     %"PRId32": 1;"    , ausbee_cs_get_error(&(am->csm_right_motor)));
     printf("Right Error sum: %"PRId32": 0.1;"  , ausbee_get_pid_error_sum(&(am->pid_right_motor)));
-    printf("Right Command:   %"PRId32": 10\r\n", right_motor_command);
+    printf("Right Command:   %"PRId32": 10\r\n", ausbee_cs_get_command(&(am->csm_right_motor)));
 
-    printf("Left Measure:   %"PRId32": 1;"     , position_get_left_encoder());
-    printf("Left Reference: %"PRId32": 1;"     , ausbee_pid_get_ref(&(am->pid_left_motor)));
-    printf("Left Error:     %"PRId32": 1;"     , ausbee_get_pid_error(&(am->pid_left_motor)));
-    printf("Left Error sum: %"PRId32": 0.1;"   , ausbee_get_pid_error_sum(&(am->pid_left_motor)));
-    printf("Left Command:   %"PRId32": 10\r\n" , left_motor_command);
+    printf("Left Measure:   %"PRId32": 1;"    , ausbee_cs_get_measure(&(am->csm_left_motor)));
+    printf("Left Reference: %"PRId32": 1;"    , ausbee_cs_get_reference(&(am->csm_left_motor)));
+    printf("Left Error:     %"PRId32": 1;"    , ausbee_cs_get_error(&(am->csm_left_motor)));
+    printf("Left Error sum: %"PRId32": 0.1;"  , ausbee_get_pid_error_sum(&(am->pid_left_motor)));
+    printf("Left Command:   %"PRId32": 10\r\n", ausbee_cs_get_command(&(am->csm_left_motor)));
 
     printf("Odometry Distance mm: %f: 1;"   , (double)position_get_distance_mm());
     printf("Odometry Angle:       %f: 1\r\n", (double)position_get_angle_deg());
@@ -79,10 +82,10 @@ void control_system_task(void *data)
 
 void control_system_set_right_motor_ref(struct asserv_manager *am, int32_t ref)
 {
-  ausbee_pid_set_ref(&(am->pid_right_motor), ref);
+  ausbee_cs_set_reference(&(am->csm_right_motor), ref);
 }
 
 void control_system_set_left_motor_ref(struct asserv_manager *am, int32_t ref)
 {
-  ausbee_pid_set_ref(&(am->pid_left_motor), ref);
+  ausbee_cs_set_reference(&(am->csm_left_motor), ref);
 }
