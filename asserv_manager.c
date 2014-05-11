@@ -1,3 +1,12 @@
+/**
+ * @file    asserv_manager.c
+ * @author  David BITONNEAU <david.bitonneau@gmail.com>
+ * @version V1.0
+ * @date    11-Mar-2014
+ * @brief   A controller system for a two-wheeled with encoders.
+ *          Implementation file.
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

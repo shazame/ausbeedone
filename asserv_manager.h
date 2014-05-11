@@ -1,3 +1,12 @@
+/**
+ * @file    asserv_manager.h
+ * @author  David BITONNEAU <david.bitonneau@gmail.com>
+ * @version V1.0
+ * @date    11-Mar-2014
+ * @brief   A controller system for a two-wheeled with encoders.
+ *          Definition file.
+ */
+
 #ifndef ASSERV_MANAGER_H
 #define ASSERV_MANAGER_H
 

@@ -1,3 +1,11 @@
+/**
+ * @file    position_manager.c
+ * @author  David BITONNEAU <david.bitonneau@gmail.com>
+ * @version V1.0
+ * @date    11-Mar-2014
+ * @brief   An odometry module. Implementation file.
+ */
+
 #include "position_manager.h"
 #include <math.h>
 #include <stdio.h>

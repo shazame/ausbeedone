@@ -1,3 +1,11 @@
+/**
+ * @file    position_manager.h
+ * @author  David BITONNEAU <david.bitonneau@gmail.com>
+ * @version V1.0
+ * @date    11-Mar-2014
+ * @brief   An odometry module. Definition file.
+ */
+
 #ifndef POSITION_MANAGER_H
 #define POSITION_MANAGER_H
 
