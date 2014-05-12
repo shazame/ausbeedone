@@ -100,6 +100,11 @@ void position_set_axle_track_mm(uint32_t d)
   pm.axle_track_mm = d;
 }
 
+uint32_t position_get_axle_track_mm(void)
+{
+  return pm.axle_track_mm;
+}
+
 int32_t position_get_left_encoder(void *UNUSED(dummy))
 {
   return pm.left_encoder;
@@ -128,4 +133,9 @@ float position_get_x_mm(void)
 float position_get_y_mm(void)
 {
   return pm.y_mm;
+}
+
+int32_t position_mm_to_ticks(float value_mm)
+{
+  return value_mm * pm.ticks_per_m / 1000.0;
 }

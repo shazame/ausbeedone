@@ -80,6 +80,17 @@ void control_system_task(void *data)
   }
 }
 
+static void control_system_set_motors_ref(struct asserv_manager *am, int32_t d_mm, float theta)
+{
+  uint32_t axle_track_mm = position_get_axle_track_mm();
+
+  int32_t right_motor_ref = position_mm_to_ticks(d_mm + (1.0 * axle_track_mm * theta) / 2);
+  int32_t left_motor_ref  = position_mm_to_ticks(d_mm - (1.0 * axle_track_mm * theta) / 2);
+
+  ausbee_cs_set_reference(&(am->csm_right_motor), right_motor_ref);
+  ausbee_cs_set_reference(&(am->csm_left_motor), left_motor_ref);
+}
+
 void control_system_set_right_motor_ref(struct asserv_manager *am, int32_t ref)
 {
   ausbee_cs_set_reference(&(am->csm_right_motor), ref);
