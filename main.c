@@ -67,7 +67,7 @@ int main(void)
   position_set_axle_track_mm(235);
 
   // Launching control system
-  start_control_system(&am);
+  control_system_start(&am);
 
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
   xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );

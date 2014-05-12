@@ -28,7 +28,7 @@ void control_system_task(void *data);
 
 struct asserv_manager am;
 
-void start_control_system(struct asserv_manager *am)
+void control_system_start(struct asserv_manager *am)
 {
   ausbee_init_pid(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd, 50, 0);
   ausbee_init_pid(&(am->pid_left_motor), PID_Kp, PID_Ki, PID_Kd, 50, 0);
