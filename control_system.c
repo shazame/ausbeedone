@@ -1,9 +1,9 @@
 /**
- * @file    asserv_manager.c
+ * @file    control_system.c
  * @author  David BITONNEAU <david.bitonneau@gmail.com>
  * @version V1.1
- * @date    11-Mar-2014
- * @brief   A controller system for a two-wheeled with encoders.
+ * @date    12-Mar-2014
+ * @brief   A controller system for a two-wheeled robot with encoders.
  *          Implementation file.
  */
 
@@ -18,7 +18,7 @@
 #include <AUSBEE/pid.h>
 
 #include "utils/position_manager.h"
-#include "asserv_manager.h"
+#include "control_system.h"
 
 #define PID_Kp 10
 #define PID_Ki 0
@@ -26,9 +26,9 @@
 
 void control_system_task(void *data);
 
-struct asserv_manager am;
+struct control_system am;
 
-void control_system_start(struct asserv_manager *am)
+void control_system_start(struct control_system *am)
 {
   ausbee_init_pid(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd, 50, 0);
   ausbee_init_pid(&(am->pid_left_motor), PID_Kp, PID_Ki, PID_Kd, 50, 0);
@@ -53,7 +53,7 @@ void control_system_start(struct asserv_manager *am)
 void control_system_task(void *data)
 {
   for (;;) {
-    struct asserv_manager *am = (struct asserv_manager *)data;
+    struct control_system *am = (struct control_system *)data;
 
     ausbee_cs_manage(&(am->csm_right_motor));
     ausbee_cs_manage(&(am->csm_left_motor));
@@ -80,7 +80,7 @@ void control_system_task(void *data)
   }
 }
 
-static void control_system_set_motors_ref(struct asserv_manager *am, int32_t d_mm, float theta)
+static void control_system_set_motors_ref(struct control_system *am, int32_t d_mm, float theta)
 {
   uint32_t axle_track_mm = position_get_axle_track_mm();
 
@@ -91,12 +91,12 @@ static void control_system_set_motors_ref(struct asserv_manager *am, int32_t d_m
   ausbee_cs_set_reference(&(am->csm_left_motor), left_motor_ref);
 }
 
-void control_system_set_right_motor_ref(struct asserv_manager *am, int32_t ref)
+void control_system_set_right_motor_ref(struct control_system *am, int32_t ref)
 {
   ausbee_cs_set_reference(&(am->csm_right_motor), ref);
 }
 
-void control_system_set_left_motor_ref(struct asserv_manager *am, int32_t ref)
+void control_system_set_left_motor_ref(struct control_system *am, int32_t ref)
 {
   ausbee_cs_set_reference(&(am->csm_left_motor), ref);
 }

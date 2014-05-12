@@ -18,13 +18,13 @@
 #include "utils/init.h"
 #include "utils/motors_wrapper.h"
 #include "utils/position_manager.h"
-#include "asserv_manager.h"
+#include "control_system.h"
 
 // Private function prototypes
 void blink1();
 void run_motors();
 // Global variables
-struct asserv_manager am;
+struct control_system am;
 struct ausbee_l298_chip right_mot, left_mot;
 
 int32_t right_motor_ref = 0;
