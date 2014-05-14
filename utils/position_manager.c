@@ -105,12 +105,12 @@ uint32_t position_get_axle_track_mm(void)
   return pm.axle_track_mm;
 }
 
-int32_t position_get_left_encoder(void *UNUSED(dummy))
+float position_get_left_encoder(void *UNUSED(dummy))
 {
   return pm.left_encoder;
 }
 
-int32_t position_get_right_encoder(void *UNUSED(dummy))
+float position_get_right_encoder(void *UNUSED(dummy))
 {
   return pm.right_encoder;
 }

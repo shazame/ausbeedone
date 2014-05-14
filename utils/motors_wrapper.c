@@ -19,12 +19,12 @@ void motors_wrapper_init(struct ausbee_l298_chip *left_motor,
   mots.right_motor = right_motor;
 }
 
-void motors_wrapper_right_motor_set_duty_cycle(void *UNUSED(dummy), int32_t duty_cycle)
+void motors_wrapper_right_motor_set_duty_cycle(void *UNUSED(dummy), float duty_cycle)
 {
   ausbee_l298_set_duty_cycle(*(mots.right_motor), (uint8_t)duty_cycle);
 }
 
-void motors_wrapper_left_motor_set_duty_cycle(void *UNUSED(dummy), int32_t duty_cycle)
+void motors_wrapper_left_motor_set_duty_cycle(void *UNUSED(dummy), float duty_cycle)
 {
   ausbee_l298_set_duty_cycle(*(mots.left_motor), (uint8_t)duty_cycle);
 }

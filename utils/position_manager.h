@@ -19,8 +19,8 @@ void position_set_axle_track_mm(uint32_t d);
 
 uint32_t position_get_axle_track_mm(void);
 
-int32_t position_get_left_encoder(void *dummy);
-int32_t position_get_right_encoder(void *dummy);
+float position_get_left_encoder(void *dummy);
+float position_get_right_encoder(void *dummy);
 
 float position_get_distance_mm(void);
 float position_get_angle_deg(void);
