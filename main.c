@@ -43,6 +43,7 @@ int main(void)
   platform_led_init();
 
   // Encoder setup
+  ausbee_encoder_clock_enable(TIM8);
   ausbee_init_sampling_timer(TIM8, 16800, 1000);
 
   // Right encoder
