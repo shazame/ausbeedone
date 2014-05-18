@@ -93,7 +93,7 @@ void blink1(void)
   for(;;) {
     platform_led_toggle(PLATFORM_LED0);
 
-    vTaskDelay(10 * portTICK_RATE_MS);
+    vTaskDelay(1000 / portTICK_RATE_MS);
   }
 }
 
@@ -117,6 +117,6 @@ void run_motors(void)
       right_motor_ref += traj[i][1];
     }
 
-    vTaskDelay(50 * portTICK_RATE_MS);
+    vTaskDelay(5000 / portTICK_RATE_MS);
   }
 }

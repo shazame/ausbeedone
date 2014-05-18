@@ -130,7 +130,7 @@ void control_system_task(void *data)
     printf("Robot x mm: %f;"   , (double)position_get_x_mm());
     printf("Robot y mm: %f\r\n", (double)position_get_y_mm());
 
-    vTaskDelay(1 * portTICK_RATE_MS); // 1 * 100 ms
+    vTaskDelay(100 / portTICK_RATE_MS); // 100 ms
   }
 }
 
