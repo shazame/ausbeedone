@@ -28,8 +28,11 @@ void control_system_task(void *data);
 
 void control_system_start(struct control_system *am)
 {
-  ausbee_init_pid(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd, 0, 50, 0);
-  ausbee_init_pid(&(am->pid_left_motor),  PID_Kp, PID_Ki, PID_Kd, 0, 50, 0);
+  ausbee_pid_init(&(am->pid_right_motor), PID_Kp, PID_Ki, PID_Kd);
+  ausbee_pid_init(&(am->pid_left_motor),  PID_Kp, PID_Ki, PID_Kd);
+
+  ausbee_pid_set_output_range(&(am->pid_right_motor), 0, 50);
+  ausbee_pid_set_output_range(&(am->pid_left_motor),  0, 50);
 
   // Initialise each control system manager
   ausbee_cs_init(&(am->csm_right_motor));
@@ -39,8 +42,8 @@ void control_system_start(struct control_system *am)
   ausbee_cs_set_measure_fetcher(&(am->csm_left_motor), position_get_left_encoder, NULL);
 
   // We use a pid controller because we like it here at Eirbot
-  ausbee_cs_set_controller(&(am->csm_right_motor), ausbee_eval_pid, (void*)&(am->pid_right_motor));
-  ausbee_cs_set_controller(&(am->csm_left_motor), ausbee_eval_pid, (void*)&(am->pid_left_motor));
+  ausbee_cs_set_controller(&(am->csm_right_motor), ausbee_pid_eval, (void*)&(am->pid_right_motor));
+  ausbee_cs_set_controller(&(am->csm_left_motor), ausbee_pid_eval, (void*)&(am->pid_left_motor));
 
   ausbee_cs_set_process_command(&(am->csm_right_motor), motors_wrapper_right_motor_set_duty_cycle, NULL);
   ausbee_cs_set_process_command(&(am->csm_left_motor), motors_wrapper_left_motor_set_duty_cycle, NULL);
@@ -59,13 +62,13 @@ void control_system_task(void *data)
     printf("Right Measure:   %f: 1;"    , (double)ausbee_cs_get_measure(&(am->csm_right_motor)));
     printf("Right Reference: %f: 1;"    , (double)ausbee_cs_get_reference(&(am->csm_right_motor)));
     printf("Right Error:     %f: 1;"    , (double)ausbee_cs_get_error(&(am->csm_right_motor)));
-    printf("Right Error sum: %f: 0.1;"  , (double)ausbee_get_pid_error_sum(&(am->pid_right_motor)));
+    printf("Right Error sum: %f: 0.1;"  , (double)ausbee_pid_get_error_sum(&(am->pid_right_motor)));
     printf("Right Command:   %f: 10\r\n", (double)ausbee_cs_get_command(&(am->csm_right_motor)));
 
     printf("Left Measure:   %f: 1;"    , (double)ausbee_cs_get_measure(&(am->csm_left_motor)));
     printf("Left Reference: %f: 1;"    , (double)ausbee_cs_get_reference(&(am->csm_left_motor)));
     printf("Left Error:     %f: 1;"    , (double)ausbee_cs_get_error(&(am->csm_left_motor)));
-    printf("Left Error sum: %f: 0.1;"  , (double)ausbee_get_pid_error_sum(&(am->pid_left_motor)));
+    printf("Left Error sum: %f: 0.1;"  , (double)ausbee_pid_get_error_sum(&(am->pid_left_motor)));
     printf("Left Command:   %f: 10\r\n", (double)ausbee_cs_get_command(&(am->csm_left_motor)));
 
     printf("Odometry Distance mm: %f: 1;"   , (double)position_get_distance_mm());
