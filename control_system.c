@@ -122,15 +122,15 @@ void control_system_task(void *data)
     //printf("Distance error mm:     %f: 1;"   , (double)ausbee_cs_get_error(&(am->csm_distance)));
     //printf("Distance command mm:   %f: 1\r\n", (double)ausbee_cs_get_command(&(am->csm_distance)));
 
-    printf("Angle reference rad:   %f: 1;"   , (double)ausbee_cs_get_reference(&(am->csm_angle)));
-    printf("Angle measure rad:     %f: 1;"   , (double)ausbee_cs_get_measure(&(am->csm_angle)));
-    printf("Angle error rad:       %f: 1;"   , (double)ausbee_cs_get_error(&(am->csm_angle)));
-    printf("Angle command rad:     %f: 1\r\n", (double)ausbee_cs_get_command(&(am->csm_angle)));
+    printf("Angle reference deg:   %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_reference(&(am->csm_angle))));
+    printf("Angle measure deg:     %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_measure(&(am->csm_angle))));
+    printf("Angle error deg:       %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_error(&(am->csm_angle))));
+    printf("Angle command deg:     %f: 1\r\n", (double)(180.0 / PI * ausbee_cs_get_command(&(am->csm_angle))));
 
     printf("Robot x mm: %f;"   , (double)position_get_x_mm());
     printf("Robot y mm: %f\r\n", (double)position_get_y_mm());
 
-    vTaskDelay(100 / portTICK_RATE_MS); // 100 ms
+    vTaskDelay(50 / portTICK_RATE_MS); // 50 ms
   }
 }
 

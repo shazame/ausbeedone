@@ -73,11 +73,8 @@ int main(void)
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
   //xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );
 
-  //control_system_set_right_motor_ref(&am, 500);
-  //control_system_set_left_motor_ref(&am, 500);
-
   //control_system_set_distance_mm_ref(&am, 500);
-  control_system_set_angle_deg_ref(&am, 60);
+  control_system_set_angle_deg_ref(&am, 90);
 
   vTaskStartScheduler();
 
