@@ -115,12 +115,17 @@ float position_get_right_encoder(void *UNUSED(dummy))
   return pm.right_encoder;
 }
 
-float position_get_distance_mm(void)
+float position_get_distance_mm(void *UNUSED(dummy))
 {
   return pm.distance_mm;
 }
 
-float position_get_angle_deg(void)
+float position_get_angle_rad(void *UNUSED(dummy))
+{
+  return pm.angle_rad;
+}
+
+float position_get_angle_deg(void *UNUSED(dummy))
 {
   return pm.angle_rad * 180.0 / PI;
 }
