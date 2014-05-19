@@ -20,9 +20,10 @@
 #include "utils/position_manager.h"
 #include "control_system.h"
 
+#include "cli.h"
+
 // Private function prototypes
 void blink1();
-void run_motors();
 // Global variables
 struct control_system am;
 struct ausbee_l298_chip right_mot, left_mot;
@@ -71,10 +72,9 @@ int main(void)
   control_system_start(&am);
 
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
-  //xTaskCreate(run_motors, (const signed char *)"RunMotors", 140, NULL, 1, NULL );
 
-  //control_system_set_distance_mm_ref(&am, 500);
-  control_system_set_angle_deg_ref(&am, 90);
+  // Launching command line interface
+  cli_start(&am);
 
   vTaskStartScheduler();
 
@@ -91,29 +91,5 @@ void blink1(void)
     platform_led_toggle(PLATFORM_LED0);
 
     vTaskDelay(1000 / portTICK_RATE_MS);
-  }
-}
-
-#define NB_POINTS 4
-void run_motors(void)
-{
-  int32_t traj[NB_POINTS][2] = {
-    {200, 200},
-    {216, 0},
-    {50, 80},
-    {0, 432}
-  };
-
-  int i = 0;
-  for(;; i++) {
-    control_system_set_right_motor_ref(&am, right_motor_ref);
-    control_system_set_left_motor_ref(&am, left_motor_ref);
-
-    if (i < NB_POINTS) {
-      left_motor_ref  += traj[i][0];
-      right_motor_ref += traj[i][1];
-    }
-
-    vTaskDelay(5000 / portTICK_RATE_MS);
   }
 }
