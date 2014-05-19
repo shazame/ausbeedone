@@ -103,6 +103,9 @@ void cli_task(void *data)
       else if (!strncmp(arg, "y", ARG_LENGTH)) {
         printf("Robot y mm: %f\r\n", (double)position_get_y_mm());
       }
+      else if (!strncmp(arg, "a", ARG_LENGTH)) {
+        printf("Robot angle deg: %f\r\n", (double)position_get_angle_deg(NULL));
+      }
       else {
         printf("Invalid argument '%s'.\r\n", arg);
       }
@@ -116,6 +119,7 @@ void cli_task(void *data)
       printf("             <arg> can be one of:\r\n");
       printf("             x: print robot's x position.\r\n");
       printf("             y: print robot's y position.\r\n");
+      printf("             a: print robot's angle.\r\n");
       printf("  h: Display this help.\r\n");
     }
     else {
