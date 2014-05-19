@@ -18,6 +18,9 @@
 #include "utils/init.h"
 #include "utils/motors_wrapper.h"
 #include "utils/position_manager.h"
+
+#include "demo/demo_square.h"
+
 #include "control_system.h"
 
 #include "cli.h"
@@ -74,7 +77,10 @@ int main(void)
   xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
 
   // Launching command line interface
-  cli_start(&am);
+  //cli_start(&am);
+
+  // Launching a demonstration
+  demo_square_start(&am);
 
   vTaskStartScheduler();
 
