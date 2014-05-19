@@ -61,13 +61,13 @@ void position_update(int32_t left_enc_diff, int32_t right_enc_diff)
   // Special case: no rotation
   if ((right_enc_diff - left_enc_diff) == 0)
   {
-    pm.x_mm += distance_diff_mm * (float)sin(pm.angle_rad);
-    pm.y_mm += distance_diff_mm * (float)cos(pm.angle_rad);
+    pm.x_mm += - distance_diff_mm * (float)sin(pm.angle_rad);
+    pm.y_mm +=   distance_diff_mm * (float)cos(pm.angle_rad);
     return;
   }
 
   // Angle
-  float angle_diff_rad = position_ticks_to_mm(right_enc_diff - left_enc_diff) / pm.axle_track_mm;
+  float angle_diff_rad = atan(position_ticks_to_mm(right_enc_diff - left_enc_diff) / pm.axle_track_mm);
 
   // Special case: only rotation -> no need to update x and y
   if ((right_enc_diff + left_enc_diff) == 0)
