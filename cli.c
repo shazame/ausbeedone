@@ -73,7 +73,7 @@ void cli_task(void *data)
   char arg[ARG_LENGTH] = {0};
   int c = 0;
 
-  for(;;) {
+  for (;;) {
     value = 0;
 
     printf("$ ");

@@ -84,7 +84,7 @@ int main(void)
 
   vTaskStartScheduler();
 
-  for(;;) {
+  for (;;) {
 
   }
 
@@ -93,7 +93,7 @@ int main(void)
 
 void blink1(void)
 {
-  for(;;) {
+  for (;;) {
     platform_led_toggle(PLATFORM_LED0);
 
     vTaskDelay(1000 / portTICK_RATE_MS);

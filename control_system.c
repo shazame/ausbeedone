@@ -29,8 +29,8 @@ static void control_system_set_angle_rad_diff(void *am, float ref);
 
 static void control_system_init_motors(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_right_motor), 5, 0, 0);
-  ausbee_pid_init(&(am->pid_left_motor),  5, 0, 0);
+  ausbee_pid_init(&(am->pid_right_motor), 3, 0, 0);
+  ausbee_pid_init(&(am->pid_left_motor),  3, 0, 0);
 
   ausbee_diff_init(&(am->diff_right_motor));
   ausbee_diff_init(&(am->diff_left_motor));
