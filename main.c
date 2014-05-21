@@ -20,6 +20,7 @@
 #include "utils/position_manager.h"
 
 #include "demo/demo_square.h"
+#include "demo/demo_circle.h"
 
 #include "control_system.h"
 #include "trajectory_manager.h"
@@ -87,6 +88,7 @@ int main(void)
 
   // Launching a demonstration
   demo_square_start(&t);
+  //demo_circle_start(&t);
 
   vTaskStartScheduler();
 
