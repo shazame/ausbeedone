@@ -89,7 +89,7 @@ void control_system_start(struct control_system *am)
   control_system_init_motors(am);
   control_system_init_distance_angle(am);
 
-  xTaskCreate(control_system_task, (const signed char *)"ControlSystem", 1000, (void *)am, 1, NULL);
+  xTaskCreate(control_system_task, (const signed char *)"ControlSystem", 200, (void *)am, 1, NULL);
 }
 
 void control_system_task(void *data)

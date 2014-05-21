@@ -10,9 +10,9 @@
 
 void cli_task(void *);
 
-void cli_start(struct control_system *am)
+void cli_start(struct trajectory_manager *t)
 {
-  xTaskCreate(cli_task, (const signed char *)"CLI", 240, (void *)am, 1, NULL );
+  xTaskCreate(cli_task, (const signed char *)"CLI", 200, (void *)t, 1, NULL );
 }
 
 static int cli_getchar(void)
@@ -66,7 +66,7 @@ static float cli_getfloat(void)
 #define ARG_LENGTH 20
 void cli_task(void *data)
 {
-  struct control_system *am = (struct control_system *)data;
+  struct trajectory_manager *t = (struct trajectory_manager *)data;
 
   char command = 0;
   float value = 0;
@@ -89,11 +89,11 @@ void cli_task(void *data)
     }
 
     if (command == 'd') {
-      control_system_set_distance_mm_ref(am, value);
+      trajectory_goto_d_mm(t, value);
       printf("Distance: %f\r\n", (double)value);
     }
     else if (command == 'a') {
-      control_system_set_angle_deg_ref(am, value);
+      trajectory_goto_a_rel_deg(t, value);
       printf("Angle: %f\r\n", (double)value);
     }
     else if (command == 'p') {

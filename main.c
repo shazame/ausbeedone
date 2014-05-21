@@ -22,6 +22,7 @@
 #include "demo/demo_square.h"
 
 #include "control_system.h"
+#include "trajectory_manager.h"
 
 #include "cli.h"
 
@@ -29,6 +30,7 @@
 void blink1();
 // Global variables
 struct control_system am;
+struct trajectory_manager t;
 struct ausbee_l298_chip right_mot, left_mot;
 
 int32_t right_motor_ref = 0;
@@ -74,13 +76,17 @@ int main(void)
   // Launching control system
   control_system_start(&am);
 
-  xTaskCreate(blink1, (const signed char *)"LED1", 140, NULL, 1, NULL );
+  // Launching trajectory manager
+  trajectory_init(&t, &am);
+  trajectory_start(&t);
+
+  xTaskCreate(blink1, (const signed char *)"LED1", 100, NULL, 1, NULL );
 
   // Launching command line interface
-  //cli_start(&am);
+  //cli_start(&t);
 
   // Launching a demonstration
-  demo_square_start(&am);
+  demo_square_start(&t);
 
   vTaskStartScheduler();
 

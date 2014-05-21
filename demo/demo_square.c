@@ -7,24 +7,20 @@
 
 void demo_square_task(void *data);
 
-void demo_square_start(struct control_system *am)
+void demo_square_start(struct trajectory_manager *t)
 {
-  xTaskCreate(demo_square_task, (const signed char *)"DemoSquare", 240, (void *)am, 1, NULL );
+  xTaskCreate(demo_square_task, (const signed char *)"DemoSquare", 100, (void *)t, 1, NULL );
 }
 
 void demo_square_task(void *data)
 {
-  struct control_system *am = (struct control_system *)data;
+  struct trajectory_manager *t = (struct trajectory_manager *)data;
 
-  int dist = 0;
-  int angl = 0;
   for(;;) {
-    dist += 300;
-    angl += 90;
-    control_system_set_distance_mm_ref(am, dist);
+    trajectory_goto_d_mm(t, 300);
     vTaskDelay(5000 / portTICK_RATE_MS);
 
-    control_system_set_angle_deg_ref(am, angl);
+    trajectory_goto_a_rel_deg(t, 90);
     vTaskDelay(5000 / portTICK_RATE_MS);
   }
 }
