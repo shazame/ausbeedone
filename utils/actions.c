@@ -43,6 +43,18 @@ void disable_turbine()
   platform_gpio_set(GPIO_ENABLE_TURBINE);
 }
 
+//Fonction utilisée pour désactiver la puissance (relais)
+void enable_power_relay(void)
+{
+  platform_gpio_reset(GPIO_RELAIS);
+}
+
+//Fonction utilisée pour activer la puissance (relais)
+void disable_power_relay(void)
+{
+  platform_gpio_set(GPIO_RELAIS);
+}
+
 //Fonction utilisée pour bouger un servo connecté sur servo_module
 //servo peut-etre un des 8 servos définis dans define.h
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle)
@@ -126,17 +138,6 @@ void move_servo_from_servo_module(uint8_t servo, uint8_t angle)
   //vTaskDelay(100);
 }
 
-//Fonction utilisé pour initialiser les servos sur servo module à leut position de départ
-void init_servo_position_depart()
-{
-  fermer_bras_gauche();
-  fermer_bras_droit();
-  init_servo_peinture_ausbee();
-  init_servo_peinture_canon();
-  fermer_servo_canon_haut();
-  fermer_servo_canon_bas();
-}
-
 //Fonctions utilitaire pour bouger les servos a des positions fixes
 void ouvrir_bras_gauche()
 {
@@ -185,7 +186,7 @@ void ouvrir_servo_canon_haut()
 
 void fermer_servo_canon_haut()
 {
-  move_servo_from_servo_module(SERVO_CANON_BAS_POSITION_FERMEE,SERVO_CANON_HAUT_POSITION_FERMEE);
+  move_servo_from_servo_module(SERVO_CANON_HAUT,SERVO_CANON_HAUT_POSITION_FERMEE);
 }
 
 void ouvrir_servo_canon_bas()

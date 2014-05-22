@@ -11,13 +11,15 @@
 
 uint8_t presence_tirette();
 uint8_t couleur_depart();
+uint8_t contact_fresque();
 
 void enable_turbine();
 void disable_turbine();
 
-void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
+void enable_power_relay();
+void disable_power_relay();
 
-void init_servo_position_depart();
+void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
 
 void ouvrir_bras_gauche();
 void fermer_bras_gauche();
