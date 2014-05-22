@@ -106,6 +106,21 @@ void cli_task(void *data)
       else if (!strncmp(arg, "a", ARG_LENGTH)) {
         printf("Robot angle deg: %f\r\n", (double)position_get_angle_deg(NULL));
       }
+      else if (!strncmp(arg, "d", ARG_LENGTH)) {
+        printf("Robot distance mm: %f\r\n", (double)position_get_distance_mm(NULL));
+      }
+      else if (!strncmp(arg, "enc_r", ARG_LENGTH)) {
+        printf("Right encoder value: %f\r\n", (double)position_get_right_encoder(NULL));
+      }
+      else if (!strncmp(arg, "enc_l", ARG_LENGTH)) {
+        printf("Left encoder value: %f\r\n", (double)position_get_left_encoder(NULL));
+      }
+      else if (!strncmp(arg, "cur_id", ARG_LENGTH)) {
+        printf("Position manager cur_id: %"PRId32"\r\n", trajectory_get_cur_id(t));
+      }
+      else if (!strncmp(arg, "last_id", ARG_LENGTH)) {
+        printf("Position manager last_id: %"PRId32"\r\n", trajectory_get_last_id(t));
+      }
       else {
         printf("Invalid argument '%s'.\r\n", arg);
       }
@@ -117,9 +132,14 @@ void cli_task(void *data)
       printf("  a <float>: Rotate with the specified angle in degrees.\r\n");
       printf("  p <arg>:   Print internal value.\r\n");
       printf("             <arg> can be one of:\r\n");
-      printf("             x: print robot's x position.\r\n");
-      printf("             y: print robot's y position.\r\n");
-      printf("             a: print robot's angle.\r\n");
+      printf("             x:        print robot's x position.\r\n");
+      printf("             y:        print robot's y position.\r\n");
+      printf("             a:        print robot's angle.\r\n");
+      printf("             d:        print robot's distance.\r\n");
+      printf("             enc_l:    print left encoder's value.\r\n");
+      printf("             enc_r:    print right encoder's value.\r\n");
+      printf("             cur_id:   print position manager's current point id.\r\n");
+      printf("             last_id:  print position manager's last point id.\r\n");
       printf("  h: Display this help.\r\n");
     }
     else {
