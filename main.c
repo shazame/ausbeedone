@@ -27,6 +27,7 @@
 
 #include "cli.h"
 
+volatile uint8_t elapsed_time = 0;
 // Private function prototypes
 void blink1();
 // Global variables
