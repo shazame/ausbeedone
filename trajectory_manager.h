@@ -3,7 +3,43 @@
 
 #include "control_system.h"
 
+#define TRAJECTORY_MAX_NB_POINTS 50
+
+#define TRAJECTORY_DEFAULT_PRECISION_D_MM  10.0
+#define TRAJECTORY_DEFAULT_PRECISION_A_DEG 1.0
+
+enum trajectory_order_type {
+  D, A_ABS, A_REL
+};
+
+struct trajectory_dest {
+  union {
+
+    struct {
+      float mm;
+      float precision;
+    } d;
+
+    struct {
+      float deg;
+      float precision;
+    } a_abs;
+
+    struct {
+      float deg;
+      float precision;
+    } a_rel;
+
+  };
+
+  enum trajectory_order_type type;
+};
+
 struct trajectory_manager {
+  struct trajectory_dest points[TRAJECTORY_MAX_NB_POINTS];
+  uint32_t cur_id;
+  uint32_t last_id;
+
   struct control_system *cs;
 };
 
@@ -22,4 +58,6 @@ void trajectory_goto_a_abs_deg(struct trajectory_manager *t,
 void trajectory_goto_a_rel_deg(struct trajectory_manager *t,
                                float a_deg);
 
+uint32_t trajectory_get_cur_id(struct trajectory_manager *t);
+uint32_t trajectory_get_last_id(struct trajectory_manager *t);
 #endif /* TRAJECTORY_MANAGER_H */
