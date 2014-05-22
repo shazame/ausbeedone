@@ -29,14 +29,14 @@ static void control_system_set_angle_rad_diff(void *am, float ref);
 
 static void control_system_init_motors(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_right_motor), 3, 0, 0);
-  ausbee_pid_init(&(am->pid_left_motor),  3, 0, 0);
+  ausbee_pid_init(&(am->pid_right_motor), 2, 0, 0);
+  ausbee_pid_init(&(am->pid_left_motor),  2, 0, 0);
 
   ausbee_diff_init(&(am->diff_right_motor));
   ausbee_diff_init(&(am->diff_left_motor));
 
   ausbee_pid_set_output_range(&(am->pid_right_motor), -50, 50);
-  ausbee_pid_set_output_range(&(am->pid_left_motor),  -50, 50);
+  ausbee_pid_set_output_range(&(am->pid_left_motor),  -52, 52);
 
   // Initialise each control system manager
   ausbee_cs_init(&(am->csm_right_motor));
