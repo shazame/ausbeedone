@@ -45,10 +45,6 @@ static void cli_getstr(char *buff, uint8_t str_length)
       break;
 
   } while (((c = cli_getchar()) != EOF) && ((char)c != CLI_DELIMITER) && ((char) c != CLI_END_CHAR));
-
-  if ((char) c != CLI_END_CHAR) {
-    while (((c = cli_getchar()) != EOF) && ((char)c != CLI_END_CHAR));
-  }
 }
 
 #define FLOAT_LENGTH 20
@@ -84,6 +80,10 @@ void cli_task(void *data)
     else if (command == 'p') {
       cli_getstr(arg, ARG_LENGTH);
     }
+    else if (command == 's') {
+      cli_getstr(arg, ARG_LENGTH);
+      value = cli_getfloat();
+    }
     else {
       while (((c = cli_getchar()) != EOF) && ((char)c != CLI_END_CHAR));
     }
@@ -95,6 +95,27 @@ void cli_task(void *data)
     else if (command == 'a') {
       trajectory_goto_a_rel_deg(t, value);
       printf("Angle: %f\r\n", (double)value);
+    }
+    else if (command == 's') {
+      if (!strncmp(arg, "d_max_speed", ARG_LENGTH)) {
+        control_system_set_distance_max_speed(t->cs, value);
+        printf("Max translation speed: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "d_max_acc", ARG_LENGTH)) {
+        control_system_set_distance_max_acc(t->cs, value);
+        printf("Max translation acceleration: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "a_max_speed", ARG_LENGTH)) {
+        control_system_set_angle_max_speed(t->cs, value);
+        printf("Max rotation speed: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "a_max_acc", ARG_LENGTH)) {
+        control_system_set_angle_max_acc(t->cs, value);
+        printf("Max rotation acceleration: %f\r\n", (double)value);
+      }
+      else {
+        printf("Invalid argument '%s'.\r\n", arg);
+      }
     }
     else if (command == 'p') {
       if (!strncmp(arg, "x", ARG_LENGTH)) {
@@ -130,6 +151,13 @@ void cli_task(void *data)
       printf("  Available commands are:\r\n");
       printf("  d <float>: Go forward/backward with the specified distance in mm.\r\n");
       printf("  a <float>: Rotate with the specified angle in degrees.\r\n");
+      printf("  s <arg> <value>:   Set internal value.\r\n");
+      printf("             <value> should be a float.\r\n");
+      printf("             <arg> can be one of:\r\n");
+      printf("             d_max_speed: set max translation speed.\r\n");
+      printf("             d_max_acc:   set max translation acceleration.\r\n");
+      printf("             a_max_speed: set max rotation speed.\r\n");
+      printf("             a_max_acc:   set max rotation acceleration.\r\n");
       printf("  p <arg>:   Print internal value.\r\n");
       printf("             <arg> can be one of:\r\n");
       printf("             x:        print robot's x position.\r\n");
