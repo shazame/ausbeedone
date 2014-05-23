@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <math.h>
 #include "stm32f4xx_conf.h"
-#include "FreeRTOS_CLI.h"
 #include "FreeRTOS.h"
 #include "list.h"
 #include "queue.h"
@@ -11,10 +10,19 @@
 #include "semphr.h"
 #include "platform.h"
 #include "misc.h"
+
 #include "utils/init.h"
 #include "utils/define.h"
 #include "utils/actions.h"
+#include "utils/motors_wrapper.h"
+#include "utils/position_manager.h"
+
+#include "control_system.h"
+#include "trajectory_manager.h"
+
 #include "AUSBEE/servo.h"
+#include <AUSBEE/l298_driver.h>
+#include <AUSBEE/encoder.h>
 
 
 // Private function prototypes
@@ -38,30 +46,64 @@ xSemaphoreHandle USART1ReceiveHandle;
 xSemaphoreHandle CANReceiveSemaphore;
 CanRxMsg CAN_RxStruct;
 
-struct ausbee_l298_chip mot_gauche; //branché sur mot1
-struct ausbee_l298_chip mot_droit;  //branché sur mot2
+struct control_system am;
+struct trajectory_manager t;
+struct ausbee_l298_chip left_mot; //branché sur mot1
+struct ausbee_l298_chip right_mot;  //branché sur mot2
 ausbeeServo servo1, servo2, servo3, servo4;
+
+int32_t right_motor_ref = 0;
+int32_t left_motor_ref = 0;
 
 int main(void) {
   // Call the platform initialization function
-  platform_led_init();
   platform_hse_pll_init();
+  platform_led_init();
   platform_usart_init(USART_DEBUG, 115200);
-  //platform_usart_init(USART1,115200);
-  init_timer_relais();
-  //platform_can_init(CAN1);
+
+  // Encoder setup
+  ausbee_encoder_clock_enable(TIM8);
+  ausbee_init_sampling_timer(TIM8, 16800, 1000);
+
+  // Right encoder
+  platform_encoder1_init();
+  ausbee_encoder_clock_enable(TIM1);
+  ausbee_encoder_init_timer(TIM1);
+
+  // Left encoder
+  platform_encoder2_init();
+  ausbee_encoder_clock_enable(TIM3);
+  ausbee_encoder_init_timer(TIM3);
+
+  init_mot(&left_mot, &right_mot);
+  
+  // Init motors_wrapper
+  motors_wrapper_init(&left_mot, &right_mot);
+
+  // Setting up position manager
+  position_init();
+  position_set_tick_per_meter(1170);
+  position_set_axle_track_mm(235);
+
+  // Launching control system
+  control_system_start(&am);
+
+  // Launching trajectory manager
+  trajectory_init(&t, &am);
+  trajectory_start(&t);
+
+  //init_timer_relais();
   //init_can();
   //init_turbine();
   //init_lidar();
   //init_servo();
-  //init_mot(&mot_gauche, &mot_droit);
-  //init_gpio_robot();
+  init_gpio_robot();
   //init_servo_position_depart();
   xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
   //xTaskCreate(move_zqsd, (const signed char *)"MOVE", 400, NULL, 1, NULL );
   xTaskCreate(blink_led, (const signed char*)"BLINK_LED",100,NULL,1,NULL);
   //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
-  xTaskCreate(relay_counter, (const signed char*)"RELAY",100,NULL,1,NULL);
+  //xTaskCreate(relay_counter, (const signed char*)"RELAY",100,NULL,1,NULL);
   vTaskStartScheduler();
 
   for(;;) {
@@ -112,13 +154,9 @@ void turbine()
 
 void test()
 {
-  
-  RCC_ClocksTypeDef clock_struct;
+  trajectory_goto_d_mm(&t, 200);
   while(1)
-  {
-    RCC_GetClocksFreq(&clock_struct);
-    printf(" SYSCLK: %u, HCLK: %u PCLK1: %u PCLK2: %u \n\r", clock_struct.SYSCLK_Frequency, clock_struct.HCLK_Frequency, clock_struct.PCLK1_Frequency, clock_struct.PCLK2_Frequency);
-  }
+    ;  
   //asserv_tempo();
   //while(1)
   //{
@@ -176,55 +214,55 @@ void asserv_tempo()
   while(presence_tirette())
     ;
   enable_turbine();
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
   vTaskDelay(80);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,1);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,1);
   vTaskDelay(75);
-  ausbee_l298_set_duty_cycle(mot_gauche,0);
-  ausbee_l298_set_duty_cycle(mot_droit,0);
+  ausbee_l298_set_duty_cycle(left_mot,0);
+  ausbee_l298_set_duty_cycle(right_mot,0);
   move_servo_from_servo_module(SERVO_BRAS_GAUCHE,70);
   vTaskDelay(50);
-  ausbee_l298_invert_output(mot_gauche,1);
-  ausbee_l298_invert_output(mot_droit,0);
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
+  ausbee_l298_invert_output(left_mot,1);
+  ausbee_l298_invert_output(right_mot,0);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
   vTaskDelay(75);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(160);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,1);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,1);
   vTaskDelay(75);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(190);
   move_servo_from_servo_module(SERVO_BRAS_GAUCHE,12);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,1);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,1);
   vTaskDelay(70);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(10);
-  ausbee_l298_set_duty_cycle(mot_gauche,0);
-  ausbee_l298_set_duty_cycle(mot_droit,0);
+  ausbee_l298_set_duty_cycle(left_mot,0);
+  ausbee_l298_set_duty_cycle(right_mot,0);
   move_servo_from_servo_module(SERVO_BRAS_GAUCHE,70);
   vTaskDelay(30);
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,1);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,1);
   vTaskDelay(75);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   move_servo_from_servo_module(SERVO_BRAS_GAUCHE,12);
   vTaskDelay(300);
-  ausbee_l298_invert_output(mot_gauche,1);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,1);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(220);                           //75
-  ausbee_l298_set_duty_cycle(mot_gauche,0);  //
-  ausbee_l298_set_duty_cycle(mot_droit,0);   //
+  ausbee_l298_set_duty_cycle(left_mot,0);  //
+  ausbee_l298_set_duty_cycle(right_mot,0);   //
   move_servo_from_servo_module(SERVO_CANON_BAS, 50);
   vTaskDelay(60);
   move_servo_from_servo_module(SERVO_CANON_BAS,79);
@@ -233,11 +271,11 @@ void asserv_tempo()
   vTaskDelay(60);
   move_servo_from_servo_module(SERVO_CANON_HAUT,24);
   vTaskDelay(60);
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
   vTaskDelay(10);
-  ausbee_l298_set_duty_cycle(mot_gauche,0);  //
-  ausbee_l298_set_duty_cycle(mot_droit,0);  //
+  ausbee_l298_set_duty_cycle(left_mot,0);  //
+  ausbee_l298_set_duty_cycle(right_mot,0);  //
   move_servo_from_servo_module(SERVO_CANON_BAS, 50);
   vTaskDelay(60);
   move_servo_from_servo_module(SERVO_CANON_BAS,79);
@@ -247,33 +285,33 @@ void asserv_tempo()
   move_servo_from_servo_module(SERVO_CANON_HAUT,24);
   vTaskDelay(60);
   platform_gpio_set(GPIO1);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,1);
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,1);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
   vTaskDelay(155);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(450);
-  ausbee_l298_invert_output(mot_gauche,1);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,1);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(145);
-  ausbee_l298_invert_output(mot_gauche,1);
-  ausbee_l298_invert_output(mot_droit,1);
+  ausbee_l298_invert_output(left_mot,1);
+  ausbee_l298_invert_output(right_mot,1);
   while(platform_gpio_get_value(GPIO9)!=1)
     ;
-  ausbee_l298_set_duty_cycle(mot_gauche,0);
-  ausbee_l298_set_duty_cycle(mot_droit,0);
+  ausbee_l298_set_duty_cycle(left_mot,0);
+  ausbee_l298_set_duty_cycle(right_mot,0);
   move_servo_from_servo_module(SERVO_PEINTURE_COTE_AUSBEE,4);
   move_servo_from_servo_module(SERVO_PEINTURE_CANON,85);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(200);
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
   vTaskDelay(200);
-  ausbee_l298_set_duty_cycle(mot_gauche,0);
-  ausbee_l298_set_duty_cycle(mot_droit,0);
+  ausbee_l298_set_duty_cycle(left_mot,0);
+  ausbee_l298_set_duty_cycle(right_mot,0);
   while(1);
 }
 
@@ -288,34 +326,34 @@ void foutre_les_fresque()
   platform_gpio_init(GPIO8, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
   while(platform_gpio_get_value(GPIO8))
     ;
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
   vTaskDelay(166);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,1);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,1);
   vTaskDelay(155);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(830);
-  ausbee_l298_invert_output(mot_gauche,1);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,1);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(155);
-  ausbee_l298_invert_output(mot_gauche,1);
-  ausbee_l298_invert_output(mot_droit,1);
+  ausbee_l298_invert_output(left_mot,1);
+  ausbee_l298_invert_output(right_mot,1);
   while(platform_gpio_get_value(GPIO9)!=1)
     ;
-  ausbee_l298_set_duty_cycle(mot_gauche,0);
-  ausbee_l298_set_duty_cycle(mot_droit,0);
+  ausbee_l298_set_duty_cycle(left_mot,0);
+  ausbee_l298_set_duty_cycle(right_mot,0);
   move_servo_from_servo_module(SERVO_PEINTURE_COTE_AUSBEE,4);
   move_servo_from_servo_module(SERVO_PEINTURE_CANON,85);
-  ausbee_l298_invert_output(mot_gauche,0);
-  ausbee_l298_invert_output(mot_droit,0);
+  ausbee_l298_invert_output(left_mot,0);
+  ausbee_l298_invert_output(right_mot,0);
   vTaskDelay(200);
-  ausbee_l298_set_duty_cycle(mot_gauche,60);
-  ausbee_l298_set_duty_cycle(mot_droit,60);
+  ausbee_l298_set_duty_cycle(left_mot,60);
+  ausbee_l298_set_duty_cycle(right_mot,60);
   vTaskDelay(200);
-  ausbee_l298_set_duty_cycle(mot_gauche,0);
-  ausbee_l298_set_duty_cycle(mot_droit,0);
+  ausbee_l298_set_duty_cycle(left_mot,0);
+  ausbee_l298_set_duty_cycle(right_mot,0);
 
   while(1);
 }
@@ -402,31 +440,31 @@ void move_zqsd()
     switch (get_clavier)
     {
       case 'z':
-        ausbee_l298_invert_output(mot_gauche,0);
-        ausbee_l298_invert_output(mot_droit,0);
+        ausbee_l298_invert_output(left_mot,0);
+        ausbee_l298_invert_output(right_mot,0);
         break;
       case 's':
-        ausbee_l298_invert_output(mot_gauche,1);
-        ausbee_l298_invert_output(mot_droit,1);
+        ausbee_l298_invert_output(left_mot,1);
+        ausbee_l298_invert_output(right_mot,1);
         break;
       case 'd':
-        ausbee_l298_invert_output(mot_gauche,0);
-        ausbee_l298_invert_output(mot_droit,1);
+        ausbee_l298_invert_output(left_mot,0);
+        ausbee_l298_invert_output(right_mot,1);
         break;
       case 'q':
-        ausbee_l298_invert_output(mot_gauche,1);
-        ausbee_l298_invert_output(mot_droit,0);
+        ausbee_l298_invert_output(left_mot,1);
+        ausbee_l298_invert_output(right_mot,0);
         break;
       /*case 'p':
         enable_turbine=1;
         break;*/
     }
-    ausbee_l298_set_duty_cycle(mot_gauche,60);
-    ausbee_l298_set_duty_cycle(mot_droit,60);
+    ausbee_l298_set_duty_cycle(left_mot,60);
+    ausbee_l298_set_duty_cycle(right_mot,60);
     //printf("super\r\n");
     vTaskDelay(200);
-    ausbee_l298_set_duty_cycle(mot_gauche,0);
-    ausbee_l298_set_duty_cycle(mot_droit,0);
+    ausbee_l298_set_duty_cycle(left_mot,0);
+    ausbee_l298_set_duty_cycle(right_mot,0);
     platform_led_toggle(PLATFORM_LED6);
   }
 }
