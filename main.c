@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <math.h>
 #include "stm32f4xx_conf.h"
+#include "FreeRTOS_CLI.h"
 #include "FreeRTOS.h"
 #include "list.h"
 #include "queue.h"
@@ -43,21 +44,20 @@ ausbeeServo servo1, servo2, servo3, servo4;
 
 int main(void) {
   // Call the platform initialization function
+  platform_led_init();
   platform_hse_pll_init();
   platform_usart_init(USART_DEBUG, 115200);
   //platform_usart_init(USART1,115200);
-  platform_led_init();
   init_timer_relais();
   //platform_can_init(CAN1);
   //init_can();
   //init_turbine();
   //init_lidar();
-  //init_usart_interrupt();
   //init_servo();
   //init_mot(&mot_gauche, &mot_droit);
-  init_gpio_robot();
+  //init_gpio_robot();
   //init_servo_position_depart();
-  //xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
+  xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
   //xTaskCreate(move_zqsd, (const signed char *)"MOVE", 400, NULL, 1, NULL );
   xTaskCreate(blink_led, (const signed char*)"BLINK_LED",100,NULL,1,NULL);
   //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
@@ -82,6 +82,7 @@ void blink_led()
 
 void relay_counter()
 {
+  //Remplacer la condition par la tirette
   while(contact_fresque()!=1)
     ;
   elapsed_time=0;
@@ -111,6 +112,13 @@ void turbine()
 
 void test()
 {
+  
+  RCC_ClocksTypeDef clock_struct;
+  while(1)
+  {
+    RCC_GetClocksFreq(&clock_struct);
+    printf(" SYSCLK: %u, HCLK: %u PCLK1: %u PCLK2: %u \n\r", clock_struct.SYSCLK_Frequency, clock_struct.HCLK_Frequency, clock_struct.PCLK1_Frequency, clock_struct.PCLK2_Frequency);
+  }
   //asserv_tempo();
   //while(1)
   //{
@@ -369,13 +377,6 @@ void lidar_detect_in_circle()
 
           angleRad = data[i].angle * 2 * M_PI / 360.0; // Degree to radian conversion
 
-          //x = (double)data[i].distance_mm*cos((float)(angleRad))-(double)DISTANCE_CENTER_TO_LIDAR;
-          //y = (double)data[i].distance_mm*sin((float)(angleRad));
-          //if (data[i].distance_mm<400)
-          //{ 
-          //  printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
-          //  printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
-          //}
           // Get point coordinates
           
           x = (double)data[i].distance_mm*cos((float)(angleRad))-(double)DISTANCE_CENTER_TO_LIDAR;
@@ -384,6 +385,7 @@ void lidar_detect_in_circle()
           {
             printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
             printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
+
           }
         }
       }

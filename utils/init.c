@@ -35,6 +35,7 @@ void init_can_rx_interrupt()
 
 void init_can()
 {
+  platform_can_init();
   CAN_InitTypeDef CAN_InitTypeDef_1;
   CAN_FilterInitTypeDef CAN_FilterInitStructure;
   CAN_StructInit(&CAN_InitTypeDef_1);
