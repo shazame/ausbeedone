@@ -35,7 +35,7 @@ void init_can_rx_interrupt()
 
 void init_can()
 {
-  platform_can_init();
+  platform_can_init(CAN1);
   CAN_InitTypeDef CAN_InitTypeDef_1;
   CAN_FilterInitTypeDef CAN_FilterInitStructure;
   CAN_StructInit(&CAN_InitTypeDef_1);
@@ -139,6 +139,7 @@ void init_turbine(void)
 
 void init_lidar()
 {
+  platform_usart_init(USART1,115200);
   init_usart_interrupt();
   USART1ReceiveHandle=xSemaphoreCreateMutex();
   if(USART1ReceiveHandle== NULL)
