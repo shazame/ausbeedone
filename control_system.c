@@ -73,9 +73,23 @@ static void control_system_init_distance_angle(struct control_system *am)
   ausbee_pid_init(&(am->pid_distance), 1, 0, 0);
   ausbee_pid_init(&(am->pid_angle),    1, 0, 0);
 
+  // Quadramp setup
+  ausbee_quadramp_init(&(am->quadramp_distance));
+  ausbee_quadramp_init(&(am->quadramp_angle));
+
+  ausbee_quadramp_set_1st_order_vars(&(am->quadramp_distance), 10, 10); // Translation speed
+  ausbee_quadramp_set_2nd_order_vars(&(am->quadramp_distance), 100, 100); // Translation acceleration
+
+  ausbee_quadramp_set_1st_order_vars(&(am->quadramp_angle), 100, 100); // Rotation speed
+  ausbee_quadramp_set_2nd_order_vars(&(am->quadramp_angle), 100, 100); // Rotation acceleration
+
   // Initialise each control system manager
   ausbee_cs_init(&(am->csm_distance));
   ausbee_cs_init(&(am->csm_angle));
+
+  // Set reference filter
+  ausbee_cs_set_reference_filter(&(am->csm_distance), ausbee_quadramp_eval, (void*)&(am->quadramp_distance));
+  ausbee_cs_set_reference_filter(&(am->csm_angle),    ausbee_quadramp_eval, (void*)&(am->quadramp_angle));
 
   // Set measure functions
   ausbee_cs_set_measure_fetcher(&(am->csm_distance), position_get_distance_mm, NULL);
@@ -127,17 +141,21 @@ void control_system_task(void *data)
     control_printf("Left Command:          %f: 10\r\n", (double)ausbee_cs_get_command(&(am->csm_left_motor)));
 
     control_printf("Distance reference mm: %f: 1;"   , (double)ausbee_cs_get_reference(&(am->csm_distance)));
+    control_printf("Distance filt ref mm:  %f: 1;"   , (double)ausbee_cs_get_filtered_reference(&(am->csm_distance)));
     control_printf("Distance measure mm:   %f: 1;"   , (double)ausbee_cs_get_measure(&(am->csm_distance)));
     control_printf("Distance error mm:     %f: 1;"   , (double)ausbee_cs_get_error(&(am->csm_distance)));
     control_printf("Distance command mm:   %f: 1\r\n", (double)ausbee_cs_get_command(&(am->csm_distance)));
 
     control_printf("Angle reference deg:   %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_reference(&(am->csm_angle))));
+    control_printf("Angle filt ref deg:    %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_filtered_reference(&(am->csm_angle))));
     control_printf("Angle measure deg:     %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_measure(&(am->csm_angle))));
     control_printf("Angle error deg:       %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_error(&(am->csm_angle))));
     control_printf("Angle command deg:     %f: 1\r\n", (double)(180.0 / PI * ausbee_cs_get_command(&(am->csm_angle))));
 
     control_printf("Robot x mm: %f;"   , (double)position_get_x_mm());
     control_printf("Robot y mm: %f\r\n", (double)position_get_y_mm());
+
+    control_printf("End\r\n");
 
     vTaskDelay(50 / portTICK_RATE_MS); // 50 ms
   }
@@ -186,4 +204,24 @@ void control_system_set_right_motor_ref(struct control_system *am, int32_t ref)
 void control_system_set_left_motor_ref(struct control_system *am, int32_t ref)
 {
   ausbee_cs_set_reference(&(am->csm_left_motor), ref);
+}
+
+void control_system_set_distance_max_speed(struct control_system *am, float max_speed)
+{
+  ausbee_quadramp_set_1st_order_vars(&(am->quadramp_distance), max_speed, max_speed);
+}
+
+void control_system_set_distance_max_acc(struct control_system *am, float max_acc)
+{
+  ausbee_quadramp_set_2nd_order_vars(&(am->quadramp_distance), max_acc, max_acc);
+}
+
+void control_system_set_angle_max_speed(struct control_system *am, float max_speed)
+{
+  ausbee_quadramp_set_1st_order_vars(&(am->quadramp_angle), max_speed, max_speed);
+}
+
+void control_system_set_angle_max_acc(struct control_system *am, float max_acc)
+{
+  ausbee_quadramp_set_2nd_order_vars(&(am->quadramp_angle), max_acc, max_acc);
 }
