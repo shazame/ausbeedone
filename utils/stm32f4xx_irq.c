@@ -13,6 +13,9 @@
 
 #include <AUSBEE/lidar.h>
 
+#include "position_manager.h"
+#include "motors_wrapper.h"
+
 // extern global variables
 //usart
 extern volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
@@ -80,14 +83,31 @@ void CAN1_RX0_IRQHandler(void) {
 }
 
 // Updating encoder value
-//void TIM8_UP_TIM13_IRQHandler(void)
-//{
-//  if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
-//    //position_update(TIM1->CNT, TIM3->CNT);
-//    //TIM_SetCounter(TIM3, 0);
-//    //TIM_ClearFlag(TIM8, TIM_FLAG_Update);
-//  }
-//}
+void TIM8_UP_TIM13_IRQHandler(void)
+{
+  if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
+    // Reading encoder value
+    int32_t left_encoder_diff = TIM3->CNT;
+    int32_t right_encoder_diff = TIM1->CNT;
+
+    // If a motor is moving backward, its encoder value
+    // is read as a negative number
+    if (!motors_wrapper_left_motor_is_moving_forward()) {
+      left_encoder_diff  = -left_encoder_diff;
+    }
+    if (!motors_wrapper_right_motor_is_moving_forward()) {
+      right_encoder_diff = -right_encoder_diff;
+    }
+
+    // Updating position
+    position_update(left_encoder_diff, right_encoder_diff);
+
+    // Resetting encoders value
+    TIM_SetCounter(TIM1, 0);
+    TIM_SetCounter(TIM3, 0);
+    TIM_ClearFlag(TIM8, TIM_FLAG_Update);
+  }
+}
 
 // Count one second
 void TIM2_IRQHandler(void)

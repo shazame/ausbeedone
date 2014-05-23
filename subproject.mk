@@ -1,1 +1,2 @@
 PROJECT_SRC_FILES=$(wildcard $(PROJECT_PATH)/$(PROJECT_SRC_DIR)/utils/*.c)
+PROJECT_SRC_FILES+=$(wildcard $(PROJECT_PATH)/$(PROJECT_SRC_DIR)/demo/*.c)

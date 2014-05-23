@@ -1,15 +1,63 @@
 #ifndef TRAJECTORY_MANAGER_H
 #define TRAJECTORY_MANAGER_H
 
-#include <stdint.h>
-#include <AUSBEE/l298_driver.h>
+#include "control_system.h"
 
-struct trajectory_manager {
-  struct ausbee_l298_chip *right_motor, *left_motor;
+#define TRAJECTORY_MAX_NB_POINTS 50
+
+#define TRAJECTORY_DEFAULT_PRECISION_D_MM  10.0
+#define TRAJECTORY_DEFAULT_PRECISION_A_DEG 1.0
+
+enum trajectory_order_type {
+  D, A_ABS, A_REL
 };
 
-void set_motors(struct trajectory_manager *traj, struct ausbee_l298_chip *right_motor, struct ausbee_l298_chip *left_motor);
-void right_motor_set_duty_cycle(void *, int32_t duty_cycle);
-void left_motor_set_duty_cycle(void *, int32_t duty_cycle);
+struct trajectory_dest {
+  union {
 
+    struct {
+      float mm;
+      float precision;
+    } d;
+
+    struct {
+      float deg;
+      float precision;
+    } a_abs;
+
+    struct {
+      float deg;
+      float precision;
+    } a_rel;
+
+  };
+
+  enum trajectory_order_type type;
+};
+
+struct trajectory_manager {
+  struct trajectory_dest points[TRAJECTORY_MAX_NB_POINTS];
+  uint32_t cur_id;
+  uint32_t last_id;
+
+  struct control_system *cs;
+};
+
+void trajectory_init(struct trajectory_manager *t,
+                     struct control_system     *cs);
+
+void trajectory_start(struct trajectory_manager *t);
+
+void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm);
+
+/* Set absolute angle. Does not depend on current angle. */
+void trajectory_goto_a_abs_deg(struct trajectory_manager *t,
+                               float a_deg_ref);
+
+/* Set relative angle. Depends on current angle. */
+void trajectory_goto_a_rel_deg(struct trajectory_manager *t,
+                               float a_deg);
+
+uint32_t trajectory_get_cur_id(struct trajectory_manager *t);
+uint32_t trajectory_get_last_id(struct trajectory_manager *t);
 #endif /* TRAJECTORY_MANAGER_H */
