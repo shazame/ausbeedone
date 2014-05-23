@@ -13,7 +13,6 @@
 #include "misc.h"
 
 #include <AUSBEE/l298_driver.h>
-#include <AUSBEE/encoder.h>
 
 #include "utils/init.h"
 #include "utils/motors_wrapper.h"
@@ -50,19 +49,8 @@ int main(void)
   platform_usart_init(USART_DEBUG, 115200);
   platform_led_init();
 
-  // Encoder setup
-  ausbee_encoder_clock_enable(TIM8);
-  ausbee_init_sampling_timer(TIM8, 16800, 1000);
-
-  // Right encoder
-  platform_encoder1_init();
-  ausbee_encoder_clock_enable(TIM1);
-  ausbee_encoder_init_timer(TIM1);
-
-  // Left encoder
-  platform_encoder2_init();
-  ausbee_encoder_clock_enable(TIM3);
-  ausbee_encoder_init_timer(TIM3);
+  // Encoders setup
+  init_encoders();
 
   // Init motors
   init_mot(&left_mot, &right_mot);
