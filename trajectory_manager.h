@@ -11,7 +11,7 @@
 #define TRAJECTORY_DEFAULT_PRECISION_A_DEG 1.0
 
 enum trajectory_order_type {
-  D, A_ABS, A_REL
+  PAUSE, D, A_ABS, A_REL
 };
 
 enum trajectory_when {
@@ -61,6 +61,9 @@ int trajectory_is_ended(struct trajectory_manager *t);
 
 uint32_t trajectory_get_cur_id(struct trajectory_manager *t);
 uint32_t trajectory_get_last_id(struct trajectory_manager *t);
+
+void trajectory_pause(struct trajectory_manager *t);
+void trajectory_resume(struct trajectory_manager *t);
 
 void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm);
 

@@ -15,6 +15,7 @@ static inline void trajectory_update(struct trajectory_manager *t);
 static void trajectory_add_point(struct trajectory_manager *t,
                                  struct trajectory_dest point,
                                  enum trajectory_when when);
+static void trajectory_next_point(struct trajectory_manager *t);
 
 /******************** User functions ********************/
 
@@ -53,6 +54,31 @@ uint32_t trajectory_get_last_id(struct trajectory_manager *t)
 }
 
 /******************** Movement functions ********************/
+
+void trajectory_pause(struct trajectory_manager *t)
+{
+  struct trajectory_dest dest;
+
+  dest.type = PAUSE;
+
+  trajectory_add_point(t, dest, NOW);
+
+  /* Force update now to stop more quickly */
+  trajectory_update(t);
+}
+
+static int trajectory_is_paused(struct trajectory_manager *t)
+{
+  return (!trajectory_is_ended(t) &&
+          (t->points[t->cur_id].type == PAUSE));
+}
+
+void trajectory_resume(struct trajectory_manager *t)
+{
+  while (trajectory_is_paused(t)) {
+    trajectory_next_point(t);
+  }
+}
 
 void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm)
 {
@@ -104,7 +130,7 @@ void trajectory_task(void *data)
   }
 }
 
-static void trajectory_next_point(struct trajectory_manager *t)
+void trajectory_next_point(struct trajectory_manager *t)
 {
   /* Update list pointer if not empty */
   if (!trajectory_is_ended(t)) {
