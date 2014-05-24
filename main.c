@@ -60,24 +60,13 @@ int main(void) {
   platform_hse_pll_init();
   platform_led_init();
   platform_usart_init(USART_DEBUG, 115200);
-
-  // Encoder setup
-  ausbee_encoder_clock_enable(TIM8);
-  ausbee_init_sampling_timer(TIM8, 16800, 1000);
-
-  // Right encoder
-  platform_encoder1_init();
-  ausbee_encoder_clock_enable(TIM1);
-  ausbee_encoder_init_timer(TIM1);
-
-  // Left encoder
-  platform_encoder2_init();
-  ausbee_encoder_clock_enable(TIM3);
-  ausbee_encoder_init_timer(TIM3);
+  
+  //Initialize encoders
+  init_encoders();
 
   init_mot(&left_mot, &right_mot);
   
-  // Init motors_wrapper
+  // Init motors_wrapper 
   motors_wrapper_init(&left_mot, &right_mot);
 
   // Setting up position manager
@@ -93,17 +82,18 @@ int main(void) {
   trajectory_start(&t);
 
   //init_timer_relais();
-  //init_can();
-  //init_turbine();
+  init_can();
+  init_turbine();
   //init_lidar();
   //init_servo();
   init_gpio_robot();
-  //init_servo_position_depart();
+  init_servo_position_depart();
   xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
   //xTaskCreate(move_zqsd, (const signed char *)"MOVE", 400, NULL, 1, NULL );
   xTaskCreate(blink_led, (const signed char*)"BLINK_LED",100,NULL,1,NULL);
-  //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
+  xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
   //xTaskCreate(relay_counter, (const signed char*)"RELAY",100,NULL,1,NULL);
+  cli_start(&t);
   vTaskStartScheduler();
 
   for(;;) {
@@ -145,25 +135,27 @@ void turbine()
 {
   while(1)
   {
-    if(couleur_depart()==COULEUR_JAUNE)
+    if(couleur_depart()==COULEUR_JAUNE){
       enable_turbine();
-    else if(couleur_depart()==COULEUR_ROUGE)
+    }
+    else if(couleur_depart()==COULEUR_ROUGE){
       disable_turbine();
+    }
   }
 }
 
 void test()
 {
-  trajectory_goto_d_mm(&t, 200);
-  while(1)
-    ;  
-  //asserv_tempo();
+  //trajectory_goto_a_rel_deg(&t, -360);
   //while(1)
-  //{
-  //  while(contact_fresque()!=1)
-  //    ;
-  //  lancer_une_balle();
-  //}
+  //  ;  
+  //asserv_tempo();
+ while(1)
+ {
+   while(contact_fresque()!=1)
+     ;
+   lancer_une_balle();
+ }
   //lidar_detect_in_circle();
   //test_lidar();
   //while(1);
