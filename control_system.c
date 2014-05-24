@@ -20,16 +20,6 @@
 #include "control_system.h"
 
 #define PI 3.1415926535
-
-#define CONTROL_PRINTF 1
-
-#if CONTROL_PRINTF == 1
-#include <stdio.h>
-#define control_printf(args...) do { printf(args); } while(0)
-#else
-#define control_printf(args...) do { } while(0)
-#endif
-
 #define DEG2RAD(a) ((a) * PI / 180.0)
 
 void control_system_task(void *data);
@@ -136,35 +126,6 @@ void control_system_task(void *data)
 
     ausbee_cs_manage(&(am->csm_right_motor));
     ausbee_cs_manage(&(am->csm_left_motor));
-
-    control_printf("Right Measure:          %f: 1;"    , (double)ausbee_cs_get_measure(&(am->csm_right_motor)));
-    control_printf("Right Filtered measure: %f: 10;"   , (double)ausbee_cs_get_filtered_measure(&(am->csm_right_motor)));
-    control_printf("Right Reference:        %f: 1;"    , (double)ausbee_cs_get_reference(&(am->csm_right_motor)));
-    control_printf("Right Error:            %f: 1;"    , (double)ausbee_cs_get_error(&(am->csm_right_motor)));
-    control_printf("Right Command:          %f: 10\r\n", (double)ausbee_cs_get_command(&(am->csm_right_motor)));
-
-    control_printf("Left Measure:          %f: 1;"    , (double)ausbee_cs_get_measure(&(am->csm_left_motor)));
-    control_printf("Left Filtered measure: %f: 10;"   , (double)ausbee_cs_get_filtered_measure(&(am->csm_left_motor)));
-    control_printf("Left Reference:        %f: 1;"    , (double)ausbee_cs_get_reference(&(am->csm_left_motor)));
-    control_printf("Left Error:            %f: 1;"    , (double)ausbee_cs_get_error(&(am->csm_left_motor)));
-    control_printf("Left Command:          %f: 10\r\n", (double)ausbee_cs_get_command(&(am->csm_left_motor)));
-
-    control_printf("Distance reference mm: %f: 1;"   , (double)ausbee_cs_get_reference(&(am->csm_distance)));
-    control_printf("Distance filt ref mm:  %f: 1;"   , (double)ausbee_cs_get_filtered_reference(&(am->csm_distance)));
-    control_printf("Distance measure mm:   %f: 1;"   , (double)ausbee_cs_get_measure(&(am->csm_distance)));
-    control_printf("Distance error mm:     %f: 1;"   , (double)ausbee_cs_get_error(&(am->csm_distance)));
-    control_printf("Distance command mm:   %f: 1\r\n", (double)ausbee_cs_get_command(&(am->csm_distance)));
-
-    control_printf("Angle reference deg:   %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_reference(&(am->csm_angle))));
-    control_printf("Angle filt ref deg:    %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_filtered_reference(&(am->csm_angle))));
-    control_printf("Angle measure deg:     %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_measure(&(am->csm_angle))));
-    control_printf("Angle error deg:       %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_error(&(am->csm_angle))));
-    control_printf("Angle command deg:     %f: 1\r\n", (double)(180.0 / PI * ausbee_cs_get_command(&(am->csm_angle))));
-
-    control_printf("Robot x mm: %f;"   , (double)position_get_x_mm());
-    control_printf("Robot y mm: %f\r\n", (double)position_get_y_mm());
-
-    control_printf("End\r\n");
 
     vTaskDelay(CONTROL_SYSTEM_PERIOD_S * 1000 / portTICK_RATE_MS);
   }
