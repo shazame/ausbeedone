@@ -31,6 +31,16 @@ void trajectory_start(struct trajectory_manager *t)
   xTaskCreate(trajectory_task, (const signed char *)"TrajectoryManager", 100, (void *)t, 1, NULL );
 }
 
+void trajectory_end(struct trajectory_manager *t)
+{
+  t->cur_id = t->last_id;
+}
+
+int trajectory_is_ended(struct trajectory_manager *t)
+{
+  return (t->cur_id == t->last_id);
+}
+
 uint32_t trajectory_get_cur_id(struct trajectory_manager *t)
 {
   return t->cur_id;
@@ -41,7 +51,7 @@ uint32_t trajectory_get_last_id(struct trajectory_manager *t)
   return t->last_id;
 }
 
-/******************** User functions ********************/
+/******************** Movement functions ********************/
 
 void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm)
 {
@@ -96,7 +106,7 @@ void trajectory_task(void *data)
 static void trajectory_next_point(struct trajectory_manager *t)
 {
   /* Update list pointer if not empty */
-  if (t->cur_id != t->last_id) {
+  if (!trajectory_is_ended(t)) {
     t->cur_id = (t->cur_id+1) % TRAJECTORY_MAX_NB_POINTS;
   }
 }
