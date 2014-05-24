@@ -89,7 +89,7 @@ void trajectory_task(void *data)
 
   for (;;) {
     trajectory_update(t);
-    vTaskDelay(100 / portTICK_RATE_MS);
+    vTaskDelay(TRAJECTORY_UPDATE_PERIOD_S * 1000 / portTICK_RATE_MS);
   }
 }
 
