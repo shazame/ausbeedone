@@ -97,21 +97,21 @@ void cli_task(void *data)
       printf("Angle: %f\r\n", (double)value);
     }
     else if (command == 's') {
-      if (!strncmp(arg, "d_max_speed", ARG_LENGTH)) {
-        control_system_set_distance_max_speed(t->cs, value);
-        printf("Max translation speed: %f\r\n", (double)value);
+      if (!strncmp(arg, "speed_high", ARG_LENGTH)) {
+        control_system_set_speed_high(t->cs);
+        printf("Max speed.\r\n");
       }
-      else if (!strncmp(arg, "d_max_acc", ARG_LENGTH)) {
-        control_system_set_distance_max_acc(t->cs, value);
-        printf("Max translation acceleration: %f\r\n", (double)value);
+      else if (!strncmp(arg, "speed_medium", ARG_LENGTH)) {
+        control_system_set_speed_medium(t->cs);
+        printf("Medium speed.\r\n");
       }
-      else if (!strncmp(arg, "a_max_speed", ARG_LENGTH)) {
-        control_system_set_angle_max_speed(t->cs, value);
-        printf("Max rotation speed: %f\r\n", (double)value);
+      else if (!strncmp(arg, "speed_low", ARG_LENGTH)) {
+        control_system_set_speed_low(t->cs);
+        printf("Low speed.\r\n");
       }
-      else if (!strncmp(arg, "a_max_acc", ARG_LENGTH)) {
-        control_system_set_angle_max_acc(t->cs, value);
-        printf("Max rotation acceleration: %f\r\n", (double)value);
+      else if (!strncmp(arg, "speed", ARG_LENGTH)) {
+        control_system_set_speed_ratio(t->cs, value);
+        printf("Low speed.\r\n");
       }
       else {
         printf("Invalid argument '%s'.\r\n", arg);
@@ -154,10 +154,10 @@ void cli_task(void *data)
       printf("  s <arg> <value>:   Set internal value.\r\n");
       printf("             <value> should be a float.\r\n");
       printf("             <arg> can be one of:\r\n");
-      printf("             d_max_speed: set max translation speed.\r\n");
-      printf("             d_max_acc:   set max translation acceleration.\r\n");
-      printf("             a_max_speed: set max rotation speed.\r\n");
-      printf("             a_max_acc:   set max rotation acceleration.\r\n");
+      printf("             speed_high:   set highest translation and rotation speed.\r\n");
+      printf("             speed_medium: set medium translation and rotation speed.\r\n");
+      printf("             speed_low:    set low translation and rotation speed.\r\n");
+      printf("             speed :       set translation and rotation speed ratio to value (0 <= value <= 1).\r\n");
       printf("  p <arg>:   Print internal value.\r\n");
       printf("             <arg> can be one of:\r\n");
       printf("             x:        print robot's x position.\r\n");

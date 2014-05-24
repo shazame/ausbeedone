@@ -3,13 +3,19 @@
 
 #include "control_system.h"
 
+#define TRAJECTORY_UPDATE_PERIOD_S 0.1 // 100 ms
+
 #define TRAJECTORY_MAX_NB_POINTS 50
 
 #define TRAJECTORY_DEFAULT_PRECISION_D_MM  10.0
 #define TRAJECTORY_DEFAULT_PRECISION_A_DEG 5.0
 
 enum trajectory_order_type {
-  D, A_ABS, A_REL
+  PAUSE, D, A_ABS, A_REL
+};
+
+enum trajectory_when {
+  NOW, END
 };
 
 struct trajectory_dest {
@@ -48,6 +54,17 @@ void trajectory_init(struct trajectory_manager *t,
 
 void trajectory_start(struct trajectory_manager *t);
 
+/* Remove every points from the trajectory */
+void trajectory_end(struct trajectory_manager *t);
+/* Check whether points remain in the trajectory*/
+int trajectory_is_ended(struct trajectory_manager *t);
+
+uint32_t trajectory_get_cur_id(struct trajectory_manager *t);
+uint32_t trajectory_get_last_id(struct trajectory_manager *t);
+
+void trajectory_pause(struct trajectory_manager *t);
+void trajectory_resume(struct trajectory_manager *t);
+
 void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm);
 
 /* Set absolute angle. Does not depend on current angle. */
@@ -57,7 +74,4 @@ void trajectory_goto_a_abs_deg(struct trajectory_manager *t,
 /* Set relative angle. Depends on current angle. */
 void trajectory_goto_a_rel_deg(struct trajectory_manager *t,
                                float a_deg);
-
-uint32_t trajectory_get_cur_id(struct trajectory_manager *t);
-uint32_t trajectory_get_last_id(struct trajectory_manager *t);
 #endif /* TRAJECTORY_MANAGER_H */
