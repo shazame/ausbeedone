@@ -21,7 +21,7 @@
 
 #define PI 3.1415926535
 
-#define CONTROL_PRINTF 1
+#define CONTROL_PRINTF 0
 
 #if CONTROL_PRINTF == 1
 #include <stdio.h>
@@ -44,8 +44,8 @@ static void control_system_init_motors(struct control_system *am)
   ausbee_diff_init(&(am->diff_right_motor));
   ausbee_diff_init(&(am->diff_left_motor));
 
-  ausbee_pid_set_output_range(&(am->pid_right_motor), -50, 50);
-  ausbee_pid_set_output_range(&(am->pid_left_motor),  -52, 52);
+  ausbee_pid_set_output_range(&(am->pid_right_motor), -100, 100);
+  ausbee_pid_set_output_range(&(am->pid_left_motor),  -100, 100);
 
   // Initialise each control system manager
   ausbee_cs_init(&(am->csm_right_motor));
