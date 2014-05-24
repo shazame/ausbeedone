@@ -12,6 +12,7 @@ void init_can_rx_interrupt();
 void init_usart_interrupt();
 //void init_servo();
 void init_mot(struct ausbee_l298_chip* mot_droit, struct ausbee_l298_chip *mot_gauche);
+void init_encoders();
 void init_turbine();
 void init_lidar();
 void init_gpio_robot();

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "init.h"
 #include "FreeRTOS.h"
 #include "list.h"
@@ -7,6 +8,8 @@
 #include "task.h"
 #include "semphr.h"
 #include "actions.h"
+
+#include <AUSBEE/encoder.h>
 
 extern xSemaphoreHandle USART1ReceiveHandle;
 
@@ -91,6 +94,22 @@ void init_mot(struct ausbee_l298_chip* mot2, struct ausbee_l298_chip* mot1)
     platform_led_toggle(PLATFORM_LED2);
   ausbee_l298_enable_chip(*mot1, 1);
 
+}
+
+void init_encoders(void)
+{
+  ausbee_encoder_clock_enable(TIM8);
+  ausbee_init_sampling_timer(TIM8, 16800, 1000);
+
+  // Right encoder
+  platform_encoder1_init();
+  ausbee_encoder_clock_enable(TIM1);
+  ausbee_encoder_init_timer(TIM1);
+
+  // Left encoder
+  platform_encoder2_init();
+  ausbee_encoder_clock_enable(TIM3);
+  ausbee_encoder_init_timer(TIM3);
 }
 
 /* initialise la pwm pour la turbine du canon
