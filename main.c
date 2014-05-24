@@ -38,6 +38,8 @@ void foutre_les_fresque();
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
 void lidar_detect_in_circle();
 void relay_counter();
+void red_side_strategy();
+void yellow_side_strategy();
 
 volatile struct ausbee_lidar_data data[AUSBEE_LIDAR_PICCOLO_DATA_LENGTH];
 volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
@@ -197,6 +199,93 @@ void test()
   }
   //test_canon();
   while(1);
+}
+
+void red_side_strategy()
+{
+  while(presence_tirette())
+    ;
+  enable_turbine();
+  trajectory_goto_d_mm(&t, 150);
+  trajectory_goto_a_rel_deg(&t, 45);
+  while(!trajectory_is_ended())
+    ;
+  ouvrir_bras_droit();
+  vTaskDelay(50);
+  trajectory_goto_a_rel_deg(&t, -45);
+  trajectory_goto_d_mm(&t, 240);
+  trajectory_goto_a_rel_deg(&t, 35);
+  while(!trajectory_is_ended())
+    ;
+  trajectory_goto_d_mm(&t, 400);
+  fermer_bras_droit();
+  trajectory_goto_a_rel_deg(&t, 55);
+  trajectory_goto_d_mm(&t, 100);
+  while(!trajectory_is_ended())
+    ;
+  ouvrir_bras_droit();
+  vTaskDelay(75);
+  fermer_bras_droit();
+  vTaskDelay(75);
+  trajectory_goto_a_rel_deg(&t, 80);
+  trajectory_goto_d_mm(&t, 400);
+  //TODO : Add lauch ball
+  trajectory_goto_a_rel_deg(&t, -80);
+  trajectory_goto_d_mm(&t, 400);
+  trajectory_goto_a_rel_deg(&t, 90);
+  trajectory_goto_d_mm(&t, 200);
+  trajectory_goto_a_rel_deg(&t, 180);
+  //TODO: add remove from stack
+  //while(contact_fresque)
+  trajectory_goto_d_mm(&t, -1000);
+  placer_peinture_ausbee();
+  placer_peinture_canon();
+  vTaskDelay(100);
+  trajectory_goto_d_mm(&t, 500);  
+
+}
+
+void yellow_side_strategy()
+{
+  while(presence_tirette())
+    ;
+  enable_turbine();
+  trajectory_goto_d_mm(&t, 150);
+  trajectory_goto_a_rel_deg(&t, -45);
+  while(!trajectory_is_ended())
+    ;
+  ouvrir_bras_gauche();
+  vTaskDelay(50);
+  trajectory_goto_a_rel_deg(&t, 45);
+  trajectory_goto_d_mm(&t, 240);
+  trajectory_goto_a_rel_deg(&t, -35);
+  while(!trajectory_is_ended())
+    ;
+  trajectory_goto_d_mm(&t, 400);
+  fermer_bras_gauche();
+  trajectory_goto_a_rel_deg(&t, -55);
+  trajectory_goto_d_mm(&t, 100);
+  while(!trajectory_is_ended())
+    ;
+  ouvrir_bras_gauche();
+  vTaskDelay(75);
+  fermer_bras_gauche();
+  vTaskDelay(75);
+  trajectory_goto_a_rel_deg(&t, -80);
+  trajectory_goto_d_mm(&t, 400);
+  //TODO : Add lauch ball
+  trajectory_goto_a_rel_deg(&t, 80);
+  trajectory_goto_d_mm(&t, 400);
+  trajectory_goto_a_rel_deg(&t, -90);
+  trajectory_goto_d_mm(&t, 200);
+  trajectory_goto_a_rel_deg(&t, -180);
+  //TODO: add remove from stack
+  //while(contact_fresque)
+  trajectory_goto_d_mm(&t, -1000);
+  placer_peinture_ausbee();
+  placer_peinture_canon();
+  vTaskDelay(100);
+  trajectory_goto_d_mm(&t, 500);  
 }
 
 void asserv_tempo()
