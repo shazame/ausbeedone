@@ -17,6 +17,7 @@
 #include "utils/init.h"
 #include "utils/motors_wrapper.h"
 #include "utils/position_manager.h"
+#include "utils/control_system_debug.h"
 
 #include "demo/demo_square.h"
 #include "demo/demo_circle.h"
@@ -78,6 +79,8 @@ int main(void)
   // Launching a demonstration
   demo_square_start(&t);
   //demo_circle_start(&t);
+
+  control_system_debug_start(&am);
 
   vTaskStartScheduler();
 
