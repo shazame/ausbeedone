@@ -13,7 +13,8 @@
 void trajectory_task(void *data);
 static inline void trajectory_update(struct trajectory_manager *t);
 static void trajectory_add_point(struct trajectory_manager *t,
-                                 struct trajectory_dest point);
+                                 struct trajectory_dest point,
+                                 enum trajectory_when when);
 
 /******************** User functions ********************/
 
@@ -62,7 +63,7 @@ void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm)
   dest.d.mm = d_mm_ref;
   dest.d.precision = TRAJECTORY_DEFAULT_PRECISION_D_MM;
 
-  trajectory_add_point(t, dest);
+  trajectory_add_point(t, dest, END);
 }
 
 /* Absolute angle = current angle + relative angle. */
@@ -75,7 +76,7 @@ void trajectory_goto_a_abs_deg(struct trajectory_manager *t,
   dest.a_abs.deg = a_deg_ref;
   dest.a_abs.precision = TRAJECTORY_DEFAULT_PRECISION_A_DEG;
 
-  trajectory_add_point(t, dest);
+  trajectory_add_point(t, dest, END);
 }
 
 void trajectory_goto_a_rel_deg(struct trajectory_manager *t,
@@ -88,7 +89,7 @@ void trajectory_goto_a_rel_deg(struct trajectory_manager *t,
   dest.a_rel.deg = a_deg_ref;
   dest.a_rel.precision = TRAJECTORY_DEFAULT_PRECISION_A_DEG;
 
-  trajectory_add_point(t, dest);
+  trajectory_add_point(t, dest, END);
 }
 
 /****************** Internal functions ******************/
@@ -111,20 +112,42 @@ static void trajectory_next_point(struct trajectory_manager *t)
   }
 }
 
-void trajectory_add_point(struct trajectory_manager *t,
-                          struct trajectory_dest point)
+static inline int trajectory_is_full(struct trajectory_manager *t)
 {
-  /* If the list is full, the new point is not added */
-  if (((t->last_id+1) % TRAJECTORY_MAX_NB_POINTS) == t->cur_id) {
-    printf("[trajectory_manager] Warning: List of points is full. Last point not added.\n");
-    return;
+  return (((t->last_id+1) % TRAJECTORY_MAX_NB_POINTS) == t->cur_id);
+}
+
+static inline void trajectory_decrease_id(uint32_t *id)
+{
+  *id = (*id + TRAJECTORY_MAX_NB_POINTS - 1) % TRAJECTORY_MAX_NB_POINTS;
+}
+
+void trajectory_add_point(struct trajectory_manager *t,
+                          struct trajectory_dest point,
+                          enum trajectory_when when)
+{
+  if (when == END) {
+    if (trajectory_is_full(t)) {
+      printf("[trajectory_manager] Warning: List of points is full. Last point not added.\n");
+      return;
+    }
+
+    /* New points are added at the end of the list */
+    t->points[t->last_id] = point;
+
+    /* Update end of list pointer */
+    t->last_id = (t->last_id + 1) % TRAJECTORY_MAX_NB_POINTS;
   }
+  else if (when == NOW) {
+    if (trajectory_is_full(t)) {
+      trajectory_decrease_id(&(t->last_id));
+      printf("[trajectory_manager] Warning: List of points is full. Last point was removed.\n");
+    }
 
-  /* New points are added at the end of the list */
-  t->points[t->last_id] = point;
-
-  /* Update end of list pointer */
-  t->last_id = (t->last_id +1 ) % TRAJECTORY_MAX_NB_POINTS;
+    /* Insert a point before the current one */
+    trajectory_decrease_id(&(t->cur_id));
+    t->points[t->cur_id] = point;
+  }
 }
 
 void trajectory_manage_order_d(struct trajectory_manager *t,

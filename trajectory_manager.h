@@ -14,6 +14,10 @@ enum trajectory_order_type {
   D, A_ABS, A_REL
 };
 
+enum trajectory_when {
+  NOW, END
+};
+
 struct trajectory_dest {
   union {
 
