@@ -21,6 +21,7 @@
 
 #include "demo/demo_square.h"
 #include "demo/demo_circle.h"
+#include "demo/demo_strat.h"
 
 #include "control_system.h"
 #include "trajectory_manager.h"
@@ -80,8 +81,9 @@ int main(void)
   //cli_start(&t);
 
   // Launching a demonstration
-  demo_square_start(&t);
+  //demo_square_start(&t);
   //demo_circle_start(&t);
+  demo_strat_start(&t);
 
   control_system_debug_start(&am);
 
