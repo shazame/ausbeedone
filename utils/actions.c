@@ -1,11 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h> 
+
+#include "FreeRTOS.h"
+#include "list.h"
+#include "queue.h"
+#include "task.h"
+#include "semphr.h"
+
 #include "platform.h"
 
+#include "define.h"
+
 #include "actions.h"
-
-
 
 // Fonction utilisée pour tester la présence de la tirette
 // Retourne 1 si la tierre est encore la

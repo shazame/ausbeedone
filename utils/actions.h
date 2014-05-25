@@ -1,13 +1,7 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
-#include "FreeRTOS.h"
-#include "list.h"
-#include "queue.h"
-#include "task.h"
-#include "semphr.h"
 
-#include "define.h"
-
+#include <stdint.h>
 
 uint8_t presence_tirette();
 uint8_t couleur_depart();
