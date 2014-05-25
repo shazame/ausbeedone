@@ -108,7 +108,7 @@ static void control_system_init_distance_angle(struct control_system *am)
 
 void control_system_start(struct control_system *am)
 {
-  control_system_init_motors(am);
+  //control_system_init_motors(am);
   control_system_init_distance_angle(am);
 
   xTaskCreate(control_system_task, (const signed char *)"ControlSystem", 200, (void *)am, 1, NULL);
@@ -124,8 +124,8 @@ void control_system_task(void *data)
 
     control_system_set_motors_ref(am, am->distance_mm_diff, am->angle_rad_diff);
 
-    ausbee_cs_manage(&(am->csm_right_motor));
-    ausbee_cs_manage(&(am->csm_left_motor));
+    //ausbee_cs_manage(&(am->csm_right_motor));
+    //ausbee_cs_manage(&(am->csm_left_motor));
 
     vTaskDelay(CONTROL_SYSTEM_PERIOD_S * 1000 / portTICK_RATE_MS);
   }
@@ -138,8 +138,11 @@ static void control_system_set_motors_ref(struct control_system *am, float d_mm,
   int32_t right_motor_ref = position_mm_to_ticks(d_mm + (1.0 * axle_track_mm * theta) / 2);
   int32_t left_motor_ref  = position_mm_to_ticks(d_mm - (1.0 * axle_track_mm * theta) / 2);
 
-  ausbee_cs_set_reference(&(am->csm_right_motor), right_motor_ref);
-  ausbee_cs_set_reference(&(am->csm_left_motor), left_motor_ref);
+  motors_wrapper_right_motor_set_duty_cycle(NULL, right_motor_ref);
+  motors_wrapper_left_motor_set_duty_cycle(NULL, left_motor_ref);
+
+  //ausbee_cs_set_reference(&(am->csm_right_motor), right_motor_ref);
+  //ausbee_cs_set_reference(&(am->csm_left_motor), left_motor_ref);
 }
 
 static void control_system_set_distance_mm_diff(void *data, float ref)
