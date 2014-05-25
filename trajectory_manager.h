@@ -29,15 +29,13 @@ struct trajectory_dest {
     struct {
       float deg;
       float precision;
-    } a_abs;
-
-    struct {
-      float deg;
-      float precision;
-    } a_rel;
+    } a;
 
   };
 
+  float starting_d_mm;
+  float starting_a_deg;
+  uint8_t is_init;
   enum trajectory_order_type type;
 };
 

@@ -30,7 +30,7 @@ void trajectory_init(struct trajectory_manager *t,
 
 void trajectory_start(struct trajectory_manager *t)
 {
-  xTaskCreate(trajectory_task, (const signed char *)"TrajectoryManager", 100, (void *)t, 1, NULL );
+  xTaskCreate(trajectory_task, (const signed char *)"TrajectoryManager", 200, (void *)t, 1, NULL );
 }
 
 void trajectory_end(struct trajectory_manager *t)
@@ -83,10 +83,9 @@ void trajectory_resume(struct trajectory_manager *t)
 void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm)
 {
   struct trajectory_dest dest;
-  float d_mm_ref = position_get_distance_mm(NULL) + d_mm;
 
   dest.type = D;
-  dest.d.mm = d_mm_ref;
+  dest.d.mm = d_mm;
   dest.d.precision = TRAJECTORY_DEFAULT_PRECISION_D_MM;
 
   trajectory_add_point(t, dest, END);
@@ -94,13 +93,13 @@ void trajectory_goto_d_mm(struct trajectory_manager *t, float d_mm)
 
 /* Absolute angle = current angle + relative angle. */
 void trajectory_goto_a_abs_deg(struct trajectory_manager *t,
-                               float a_deg_ref)
+                               float a_deg)
 {
   struct trajectory_dest dest;
 
   dest.type = A_ABS;
-  dest.a_abs.deg = a_deg_ref;
-  dest.a_abs.precision = TRAJECTORY_DEFAULT_PRECISION_A_DEG;
+  dest.a.deg = a_deg;
+  dest.a.precision = TRAJECTORY_DEFAULT_PRECISION_A_DEG;
 
   trajectory_add_point(t, dest, END);
 }
@@ -109,11 +108,10 @@ void trajectory_goto_a_rel_deg(struct trajectory_manager *t,
                                float a_deg)
 {
   struct trajectory_dest dest;
-  float a_deg_ref = position_get_angle_deg(NULL) + a_deg;
 
   dest.type = A_REL;
-  dest.a_rel.deg = a_deg_ref;
-  dest.a_rel.precision = TRAJECTORY_DEFAULT_PRECISION_A_DEG;
+  dest.a.deg = a_deg;
+  dest.a.precision = TRAJECTORY_DEFAULT_PRECISION_A_DEG;
 
   trajectory_add_point(t, dest, END);
 }
@@ -152,6 +150,8 @@ void trajectory_add_point(struct trajectory_manager *t,
                           struct trajectory_dest point,
                           enum trajectory_when when)
 {
+  point.is_init = 0;
+
   if (when == END) {
     if (trajectory_is_full(t)) {
       printf("[trajectory_manager] Warning: List of points is full. Last point not added.\n");
@@ -179,11 +179,12 @@ void trajectory_add_point(struct trajectory_manager *t,
 void trajectory_manage_order_d(struct trajectory_manager *t,
                                struct trajectory_dest *p)
 {
-  if (ABS(p->d.mm - position_get_distance_mm(NULL)) < p->d.precision) {
+  float d_mm_ref = p->starting_d_mm + p->d.mm;
+  if (ABS(d_mm_ref - position_get_distance_mm(NULL)) < p->d.precision) {
     trajectory_next_point(t);
   }
   else {
-    control_system_set_distance_mm_ref(t->cs, p->d.mm);
+    control_system_set_distance_mm_ref(t->cs, d_mm_ref);
   }
 }
 
@@ -191,22 +192,23 @@ void trajectory_manage_order_a_abs(struct trajectory_manager *t,
                                    struct trajectory_dest *p)
 {
   // TODO: Better handle
-  if (ABS(p->a_abs.deg - position_get_angle_deg(NULL)) < p->a_abs.precision) {
+  if (ABS(p->a.deg - position_get_angle_deg(NULL)) < p->a.precision) {
     trajectory_next_point(t);
   }
   else {
-    control_system_set_angle_deg_ref(t->cs, p->a_abs.deg);
+    control_system_set_angle_deg_ref(t->cs, p->a.deg);
   }
 }
 
 void trajectory_manage_order_a_rel(struct trajectory_manager *t,
                                    struct trajectory_dest *p)
 {
-  if (ABS(p->a_rel.deg - position_get_angle_deg(NULL)) < p->a_rel.precision) {
+  float a_deg_ref = p->starting_a_deg + p->a.deg;
+  if (ABS(a_deg_ref - position_get_angle_deg(NULL)) < p->a.precision) {
     trajectory_next_point(t);
   }
   else {
-    control_system_set_angle_deg_ref(t->cs, p->a_rel.deg);
+    control_system_set_angle_deg_ref(t->cs, a_deg_ref);
   }
 }
 
@@ -219,6 +221,13 @@ inline void trajectory_update(struct trajectory_manager *t)
 
   /* Get current point reference */
   struct trajectory_dest *p = t->points + t->cur_id;
+
+  /* Get current starting position in distance and angle */
+  if (!p->is_init) {
+    p->starting_d_mm = position_get_distance_mm(NULL);
+    p->starting_a_deg = position_get_angle_deg(NULL);
+    p->is_init = 1;
+  }
 
   /* Set new reference according to point type */
   switch (p->type) {
