@@ -15,7 +15,6 @@
 #include <AUSBEE/l298_driver.h>
 
 #include "utils/init.h"
-#include "utils/actions.h"
 #include "utils/motors_wrapper.h"
 #include "utils/position_manager.h"
 #include "utils/control_system_debug.h"
@@ -73,8 +72,6 @@ int main(void)
   trajectory_start(&t);
 
   xTaskCreate(blink1, (const signed char *)"LED1", 100, NULL, 1, NULL );
-
-  while(presence_tirette());
 
   // Launching command line interface
   //cli_start(&t);

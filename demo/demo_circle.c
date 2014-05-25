@@ -3,6 +3,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "../utils/actions.h"
 #include "demo_circle.h"
 
 void demo_circle_task(void *data);
@@ -15,6 +16,8 @@ void demo_circle_start(struct trajectory_manager *t)
 void demo_circle_task(void *data)
 {
   struct trajectory_manager *t = (struct trajectory_manager *)data;
+
+  while(presence_tirette());
 
   for(;;) {
     trajectory_goto_d_mm(t, 800);
