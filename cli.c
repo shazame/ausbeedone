@@ -111,7 +111,7 @@ void cli_task(void *data)
       }
       else if (!strncmp(arg, "speed", ARG_LENGTH)) {
         control_system_set_speed_ratio(t->cs, value);
-        printf("Low speed.\r\n");
+        printf("Speed: %f\r\n", (double)value);
       }
       else {
         printf("Invalid argument '%s'.\r\n", arg);
