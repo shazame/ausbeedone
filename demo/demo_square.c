@@ -16,11 +16,17 @@ void demo_square_start(struct trajectory_manager *t)
 void demo_square_task(void *data)
 {
   struct trajectory_manager *t = (struct trajectory_manager *)data;
+  int i = 0;
 
   while(presence_tirette());
 
   for(;;) {
-    trajectory_goto_d_mm(t, 300);
-    trajectory_goto_a_rel_deg(t, 90);
+
+    for (i = 0; i < 4; i++) {
+      trajectory_goto_d_mm(t, 300);
+      while(!trajectory_is_ended(t));
+      trajectory_goto_a_rel_deg(t, 90);
+      while(!trajectory_is_ended(t));
+    }
   }
 }
