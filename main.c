@@ -50,6 +50,9 @@ int main(void)
   platform_usart_init(USART_DEBUG, 115200);
   platform_led_init();
 
+  //init_servo_position_depart();
+  //init_gpio_robot();
+
   // Encoders setup
   init_encoders();
 
