@@ -5,6 +5,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "utils/actions.h"
 #include "utils/position_manager.h"
 #include "cli.h"
 
@@ -67,6 +68,7 @@ void cli_task(void *data)
   char command = 0;
   float value = 0;
   char arg[ARG_LENGTH] = {0};
+  char arg2[ARG_LENGTH] = {0};
   int c = 0;
 
   for (;;) {
@@ -83,6 +85,10 @@ void cli_task(void *data)
     else if (command == 's') {
       cli_getstr(arg, ARG_LENGTH);
       value = cli_getfloat();
+    }
+    else if (command == 'm') {
+      cli_getstr(arg, ARG_LENGTH);
+      cli_getstr(arg2, ARG_LENGTH);
     }
     else {
       while (((c = cli_getchar()) != EOF) && ((char)c != CLI_END_CHAR));
@@ -146,6 +152,60 @@ void cli_task(void *data)
         printf("Invalid argument '%s'.\r\n", arg);
       }
     }
+    else if (command == 'm'){
+      if (!strncmp(arg, "arm_l", ARG_LENGTH)) {
+        if (!strncmp(arg2, "open", ARG_LENGTH)) {
+          ouvrir_bras_gauche();
+          printf("Left arm open\r\n");
+        }
+        else if (!strncmp(arg2, "close", ARG_LENGTH)) {
+          fermer_bras_gauche();
+          printf("Left arm close\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg);
+        }
+      }
+      else if (!strncmp(arg, "arm_r", ARG_LENGTH)) {
+        if (!strncmp(arg2, "open", ARG_LENGTH)) {
+          ouvrir_bras_droit();
+          printf("Left arm open\r\n");
+        }
+        else if (!strncmp(arg2, "close", ARG_LENGTH)) {
+          fermer_bras_droit();
+          printf("Left arm close\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg);
+        }
+      }
+      else if (!strncmp(arg, "paint_r", ARG_LENGTH)) {
+        if (!strncmp(arg2, "put", ARG_LENGTH)) {
+          placer_peinture_canon();
+          printf("Left arm open\r\n");
+        }
+        else if (!strncmp(arg2, "release", ARG_LENGTH)) {
+          init_servo_peinture_canon();
+          printf("Left arm close\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg);
+        }
+      }
+      else if (!strncmp(arg, "paint_l", ARG_LENGTH)) {
+        if (!strncmp(arg2, "put", ARG_LENGTH)) {
+          placer_peinture_ausbee();
+          printf("Left arm open\r\n");
+        }
+        else if (!strncmp(arg2, "release", ARG_LENGTH)) {
+          init_servo_peinture_ausbee();
+          printf("Left arm close\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg);
+        }
+      }
+    }
     else if (command == 'h') {
       printf("Help:\r\n");
       printf("  Available commands are:\r\n");
@@ -158,6 +218,18 @@ void cli_task(void *data)
       printf("             speed_medium: set medium translation and rotation speed.\r\n");
       printf("             speed_low:    set low translation and rotation speed.\r\n");
       printf("             speed :       set translation and rotation speed ratio to value (0 <= value <= 1).\r\n");
+      printf("  m <arg> <arg2> : move an actuator\r\n");
+      printf("             <arg> can be one of: \r\n");
+      printf("             arm_l: left_arm \r\n");
+      printf("             arm_r: right_arm \r\n");
+      printf("                <arg2> can be one of: \r\n");
+      printf("                close: close the arm \r\n");
+      printf("                open: open the arm \r\n");
+      printf("             paint_r: right_paint \r\n");
+      printf("             paint_l: left_paint \r\n");
+      printf("                <arg2> can be one of: \r\n");
+      printf("                put: put the paint on the \"fresque\" \r\n");
+      printf("                release: release the paint on the \"fresque\" \r\n");
       printf("  p <arg>:   Print internal value.\r\n");
       printf("             <arg> can be one of:\r\n");
       printf("             x:        print robot's x position.\r\n");
