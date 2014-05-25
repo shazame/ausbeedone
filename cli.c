@@ -163,7 +163,7 @@ void cli_task(void *data)
           printf("Left arm close\r\n");
         }
         else {
-          printf("Invalid argument '%s'.\r\n", arg);
+          printf("Invalid argument '%s'.\r\n", arg2);
         }
       }
       else if (!strncmp(arg, "arm_r", ARG_LENGTH)) {
@@ -176,7 +176,7 @@ void cli_task(void *data)
           printf("Left arm close\r\n");
         }
         else {
-          printf("Invalid argument '%s'.\r\n", arg);
+          printf("Invalid argument '%s'.\r\n", arg2);
         }
       }
       else if (!strncmp(arg, "paint_r", ARG_LENGTH)) {
@@ -189,7 +189,7 @@ void cli_task(void *data)
           printf("Left arm close\r\n");
         }
         else {
-          printf("Invalid argument '%s'.\r\n", arg);
+          printf("Invalid argument '%s'.\r\n", arg2);
         }
       }
       else if (!strncmp(arg, "paint_l", ARG_LENGTH)) {
@@ -202,8 +202,11 @@ void cli_task(void *data)
           printf("Left arm close\r\n");
         }
         else {
-          printf("Invalid argument '%s'.\r\n", arg);
+          printf("Invalid argument '%s'.\r\n", arg2);
         }
+      }
+      else {
+        printf("Invalid argument '%s'.\r\n", arg);
       }
     }
     else if (command == 'h') {
