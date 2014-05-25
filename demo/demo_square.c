@@ -18,9 +18,6 @@ void demo_square_task(void *data)
 
   for(;;) {
     trajectory_goto_d_mm(t, 300);
-    vTaskDelay(5000 / portTICK_RATE_MS);
-
     trajectory_goto_a_rel_deg(t, 90);
-    vTaskDelay(5000 / portTICK_RATE_MS);
   }
 }
