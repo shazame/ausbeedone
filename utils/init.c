@@ -9,6 +9,8 @@
 #include "semphr.h"
 #include "actions.h"
 
+#include "define.h"
+
 #include <AUSBEE/encoder.h>
 
 extern xSemaphoreHandle USART1ReceiveHandle;
