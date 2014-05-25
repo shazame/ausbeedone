@@ -57,6 +57,8 @@ void trajectory_end(struct trajectory_manager *t);
 /* Check whether points remain in the trajectory*/
 int trajectory_is_ended(struct trajectory_manager *t);
 
+void trajectory_next_point(struct trajectory_manager *t);
+
 uint32_t trajectory_get_cur_id(struct trajectory_manager *t);
 uint32_t trajectory_get_last_id(struct trajectory_manager *t);
 

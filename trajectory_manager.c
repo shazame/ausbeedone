@@ -15,7 +15,6 @@ static inline void trajectory_update(struct trajectory_manager *t);
 static void trajectory_add_point(struct trajectory_manager *t,
                                  struct trajectory_dest point,
                                  enum trajectory_when when);
-static void trajectory_next_point(struct trajectory_manager *t);
 
 /******************** User functions ********************/
 
@@ -41,6 +40,14 @@ void trajectory_end(struct trajectory_manager *t)
 int trajectory_is_ended(struct trajectory_manager *t)
 {
   return (t->cur_id == t->last_id);
+}
+
+void trajectory_next_point(struct trajectory_manager *t)
+{
+  /* Update list pointer if not empty */
+  if (!trajectory_is_ended(t)) {
+    t->cur_id = (t->cur_id+1) % TRAJECTORY_MAX_NB_POINTS;
+  }
 }
 
 uint32_t trajectory_get_cur_id(struct trajectory_manager *t)
@@ -125,14 +132,6 @@ void trajectory_task(void *data)
   for (;;) {
     trajectory_update(t);
     vTaskDelay(TRAJECTORY_UPDATE_PERIOD_S * 1000 / portTICK_RATE_MS);
-  }
-}
-
-void trajectory_next_point(struct trajectory_manager *t)
-{
-  /* Update list pointer if not empty */
-  if (!trajectory_is_ended(t)) {
-    t->cur_id = (t->cur_id+1) % TRAJECTORY_MAX_NB_POINTS;
   }
 }
 
