@@ -5,6 +5,8 @@
 
 #include "control_system_debug.h"
 
+#define PI 3.1415926535
+
 void control_system_debug_task(void *);
 
 void control_system_debug_start(struct control_system *cs)
@@ -23,16 +25,18 @@ void control_system_debug_task(void *data)
     //printf("Right Error:            %f: 1;"    , (double)ausbee_cs_get_error(&(cs->csm_right_motor)));
     //printf("Right Command:          %f: 10\r\n", (double)ausbee_cs_get_command(&(cs->csm_right_motor)));
 
-    printf("Left Measure:          %f: 1;"    , (double)ausbee_cs_get_measure(&(cs->csm_left_motor)));
-    printf("Left Filtered measure: %f: 10;"   , (double)ausbee_cs_get_filtered_measure(&(cs->csm_left_motor)));
-    printf("Left Reference:        %f: 1;"    , (double)ausbee_cs_get_reference(&(cs->csm_left_motor)));
-    printf("Left Error:            %f: 1;"    , (double)ausbee_cs_get_error(&(cs->csm_left_motor)));
-    printf("Left Command:          %f: 10\r\n", (double)ausbee_cs_get_command(&(cs->csm_left_motor)));
+    //printf("Left Measure:          %f: 1;"    , (double)ausbee_cs_get_measure(&(cs->csm_left_motor)));
+    //printf("Left Filtered measure: %f: 10;"   , (double)ausbee_cs_get_filtered_measure(&(cs->csm_left_motor)));
+    //printf("Left Reference:        %f: 1;"    , (double)ausbee_cs_get_reference(&(cs->csm_left_motor)));
+    //printf("Left Error:            %f: 1;"    , (double)ausbee_cs_get_error(&(cs->csm_left_motor)));
+    //printf("Left Command:          %f: 10\r\n", (double)ausbee_cs_get_command(&(cs->csm_left_motor)));
 
     printf("Distance reference mm: %f: 1;"   , (double)ausbee_cs_get_reference(&(cs->csm_distance)));
     printf("Distance filt ref mm:  %f: 1;"   , (double)ausbee_cs_get_filtered_reference(&(cs->csm_distance)));
     printf("Distance measure mm:   %f: 1;"   , (double)ausbee_cs_get_measure(&(cs->csm_distance)));
     printf("Distance error mm:     %f: 1;"   , (double)ausbee_cs_get_error(&(cs->csm_distance)));
+    printf("Distance error sum mm: %f: 1;"   , (double)ausbee_pid_get_error_sum(&(cs->pid_distance)));
+    printf("Distance error diff mm: %f: 1;"   , (double)ausbee_pid_get_error_diff(&(cs->pid_distance)));
     printf("Distance command mm:   %f: 10\r\n", (double)ausbee_cs_get_command(&(cs->csm_distance)));
 
     //printf("Angle reference deg:   %f: 1;"   , (double)(180.0 / PI * ausbee_cs_get_reference(&(cs->csm_angle))));
