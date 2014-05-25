@@ -61,8 +61,11 @@ static void control_system_init_motors(struct control_system *am)
 
 static void control_system_init_distance_angle(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_distance), 1, 0, 0);
-  ausbee_pid_init(&(am->pid_angle),    1, 0, 0);
+  ausbee_pid_init(&(am->pid_distance), 1, 0.1, 1);
+  ausbee_pid_init(&(am->pid_angle),    1, 0.1, 1);
+
+  ausbee_pid_set_output_range(&(am->pid_distance), -100, 100);
+  ausbee_pid_set_output_range(&(am->pid_angle),  -100, 100);
 
   // Quadramp setup
   ausbee_quadramp_init(&(am->quadramp_distance));
@@ -80,7 +83,7 @@ static void control_system_init_distance_angle(struct control_system *am)
                                      DEG2RAD(ANGLE_MAX_ACC_DEG),
                                      DEG2RAD(ANGLE_MAX_ACC_DEG)); // Rotation acceleration (in rad/s^2)
 
-  control_system_set_speed_low(am);
+  control_system_set_speed_high(am);
 
   // Initialise each control system manager
   ausbee_cs_init(&(am->csm_distance));
