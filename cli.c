@@ -119,6 +119,34 @@ void cli_task(void *data)
         control_system_set_speed_ratio(t->cs, value);
         printf("Speed: %f\r\n", (double)value);
       }
+      else if (!strncmp(arg, "pid_d_P", ARG_LENGTH)) {
+        ausbee_pid_set_kp(&(t->cs->pid_distance), value);
+        printf("Distance P: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "pid_d_I", ARG_LENGTH)) {
+        ausbee_pid_set_ki(&(t->cs->pid_distance), value);
+        printf("Distance I: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "pid_d_D", ARG_LENGTH)) {
+        ausbee_pid_set_kd(&(t->cs->pid_distance), value);
+        printf("Distance D: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "pid_a_P", ARG_LENGTH)) {
+        ausbee_pid_set_kp(&(t->cs->pid_angle), value);
+        printf("Angle P: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "pid_a_I", ARG_LENGTH)) {
+        ausbee_pid_set_ki(&(t->cs->pid_angle), value);
+        printf("Angle I: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "pid_a_D", ARG_LENGTH)) {
+        ausbee_pid_set_kd(&(t->cs->pid_angle), value);
+        printf("Angle D: %f\r\n", (double)value);
+      }
+      else if (!strncmp(arg, "axle_track", ARG_LENGTH)) {
+        position_set_axle_track_mm(value);
+        printf("Axle track: %f\r\n", (double)value);
+      }
       else {
         printf("Invalid argument '%s'.\r\n", arg);
       }
@@ -147,6 +175,14 @@ void cli_task(void *data)
       }
       else if (!strncmp(arg, "last_id", ARG_LENGTH)) {
         printf("Position manager last_id: %"PRId32"\r\n", trajectory_get_last_id(t));
+      }
+      else if (!strncmp(arg, "pid_dump", ARG_LENGTH)) {
+        printf("Distance PID: %f, %f, %f\r\n", (double)ausbee_pid_get_kp(&(t->cs->pid_distance)),
+                                               (double)ausbee_pid_get_ki(&(t->cs->pid_distance)),
+                                               (double)ausbee_pid_get_kd(&(t->cs->pid_distance)));
+        printf("Angle PID:    %f, %f, %f\r\n", (double)ausbee_pid_get_kp(&(t->cs->pid_angle)),
+                                               (double)ausbee_pid_get_ki(&(t->cs->pid_angle)),
+                                               (double)ausbee_pid_get_kd(&(t->cs->pid_angle)));
       }
       else {
         printf("Invalid argument '%s'.\r\n", arg);
@@ -221,6 +257,13 @@ void cli_task(void *data)
       printf("             speed_medium: set medium translation and rotation speed.\r\n");
       printf("             speed_low:    set low translation and rotation speed.\r\n");
       printf("             speed :       set translation and rotation speed ratio to value (0 <= value <= 1).\r\n");
+      printf("             pid_d_P :     set distance PID proportional value.\r\n");
+      printf("             pid_d_I :     set distance PID integral value.\r\n");
+      printf("             pid_d_D :     set distance PID derivative value.\r\n");
+      printf("             pid_a_P :     set angle PID proportional value.\r\n");
+      printf("             pid_a_I :     set angle PID integral value.\r\n");
+      printf("             pid_a_D :     set angle PID derivative value.\r\n");
+      printf("             axle_track :  set axle track in mm.\r\n");
       printf("  m <arg> <arg2> : move an actuator\r\n");
       printf("             <arg> can be one of: \r\n");
       printf("             arm_l: left_arm \r\n");
@@ -243,6 +286,12 @@ void cli_task(void *data)
       printf("             enc_r:    print right encoder's value.\r\n");
       printf("             cur_id:   print position manager's current point id.\r\n");
       printf("             last_id:  print position manager's last point id.\r\n");
+      printf("             pid_d_P : print distance PID proportional value.\r\n");
+      printf("             pid_d_I : print distance PID integral value.\r\n");
+      printf("             pid_d_D : print distance PID derivative value.\r\n");
+      printf("             pid_a_P : print angle PID proportional value.\r\n");
+      printf("             pid_a_I : print angle PID integral value.\r\n");
+      printf("             pid_a_D : print angle PID derivative value.\r\n");
       printf("  h: Display this help.\r\n");
     }
     else {
