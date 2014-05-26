@@ -61,8 +61,8 @@ static void control_system_init_motors(struct control_system *am)
 
 static void control_system_init_distance_angle(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_distance), 1, 0.1, 1);
-  ausbee_pid_init(&(am->pid_angle),    1, 0.1, 1);
+  ausbee_pid_init(&(am->pid_distance), 1, 0.3, 2.0);
+  ausbee_pid_init(&(am->pid_angle),    1, 0.01, 0);
 
   ausbee_pid_set_output_range(&(am->pid_distance), -100, 100);
   ausbee_pid_set_output_range(&(am->pid_angle),  -100, 100);
