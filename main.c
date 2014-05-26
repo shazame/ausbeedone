@@ -89,7 +89,7 @@ int main(void) {
 
   //init_timer_relais();
   init_can();
-  //init_lidar();
+  init_lidar();
   //init_servo();
   init_gpio_robot();
   init_turbine();
@@ -98,6 +98,7 @@ int main(void) {
   //xTaskCreate(move_zqsd, (const signed char *)"MOVE", 400, NULL, 1, NULL );
   xTaskCreate(blink_led, (const signed char*)"BLINK_LED",100,NULL,1,NULL);
   //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
+  xTaskCreate(lidar_detect_in_circle,(const signed char*)"LIDAR",350,NULL,1,NULL);
   //xTaskCreate(relay_counter, (const signed char*)"RELAY",100,NULL,1,NULL);
   //demo_strat_start(&t);
   //cli_start(&t);
@@ -538,37 +539,72 @@ void test_lidar_robot_running()
 //    --> center is 10.5cm far from the lidar, aligned with it.
 void lidar_detect_in_circle()
 {
+  uint8_t obstacle=0;
   while(1)
   {
-    if(xSemaphoreTake(USART1ReceiveHandle,100)==pdTRUE)
+    while (obstacle==0)
     {
-      ausbee_lidar_parse_piccolo(buffer,data);
-      int i=0;
-      for(i=0; i<AUSBEE_LIDAR_PICCOLO_DATA_LENGTH; i++)
+      if(xSemaphoreTake(USART1ReceiveHandle,100)==pdTRUE)
       {
-	      if ((!data[i].error) && (!data[i].strengthWarning)) //If data is valid
-        { 
-          double x, y;
-          double angleRad;
+        ausbee_lidar_parse_piccolo(buffer,data);
+        int i=0;
+        for(i=0; i<AUSBEE_LIDAR_PICCOLO_DATA_LENGTH; i++)
+        {
+          if ((!data[i].error) && (!data[i].strengthWarning)) //If data is valid
+          { 
+            double x, y;
+            double angleRad;
 
-          angleRad = data[i].angle * 2 * M_PI / 360.0; // Degree to radian conversion
+            angleRad = data[i].angle * 2 * M_PI / 360.0; // Degree to radian conversion
 
-          // Get point coordinates
-          
-          x = (double)data[i].distance_mm*cos((float)(angleRad))-(double)DISTANCE_CENTER_TO_LIDAR;
-          y = (double)data[i].distance_mm*sin((float)(angleRad));
-          if(sqrt(x*x+y*y)<(double)(CIRCLE_LIDAR_DIAMETER/2))
-          {
-            printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
-            printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
+            // Get point coordinates
 
+            x = (double)data[i].distance_mm*cos((float)(angleRad))-(double)DISTANCE_CENTER_TO_LIDAR;
+            y = (double)data[i].distance_mm*sin((float)(angleRad));
+            if(sqrt(x*x+y*y)<(double)(CIRCLE_LIDAR_DIAMETER/2))
+            {
+              printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
+              printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
+              obstacle=1;
+            }
           }
         }
       }
     }
+    TIM_SetCounter(TIM7,0);
+    while(TIM_GetCounter(TIM7)<8400) // 0.5s
+    {
+      if(xSemaphoreTake(USART1ReceiveHandle,100)==pdTRUE)
+      {
+        ausbee_lidar_parse_piccolo(buffer,data);
+        int i=0;
+        for(i=0; i<AUSBEE_LIDAR_PICCOLO_DATA_LENGTH; i++)
+        {
+          if ((!data[i].error) && (!data[i].strengthWarning)) //If data is valid
+          { 
+            double x, y;
+            double angleRad;
+
+            angleRad = data[i].angle * 2 * M_PI / 360.0; // Degree to radian conversion
+
+            // Get point coordinates
+
+            x = (double)data[i].distance_mm*cos((float)(angleRad))-(double)DISTANCE_CENTER_TO_LIDAR;
+            y = (double)data[i].distance_mm*sin((float)(angleRad));
+            if(sqrt(x*x+y*y)<(double)(CIRCLE_LIDAR_DIAMETER/2))
+            {
+              printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
+              printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
+              TIM_SetCounter(TIM7,0);
+            }
+          }
+        }
+      }
+    }
+    obstacle=0;
+
   }
 }
-
 void move_zqsd()
 {
   char get_clavier;

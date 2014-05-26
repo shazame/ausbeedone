@@ -162,6 +162,25 @@ void init_lidar()
 {
   platform_usart_init(USART1,115200);
   init_usart_interrupt();
+
+  //init timer used to know if the obstacle is still in front of the robot
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);  // give clock to the TIM7
+
+  TIM_TimeBaseInitTypeDef TimeBaseInit_lidar;
+  TIM_TimeBaseStructInit(&TimeBaseInit_lidar);  // initialize the struct
+
+  //timer is initialize to count 1s
+  TimeBaseInit_lidar.TIM_Prescaler=10000;                    // 168MHz/168Khz
+  TimeBaseInit_lidar.TIM_CounterMode = TIM_CounterMode_Up;  // counter mode up
+  TimeBaseInit_lidar.TIM_Period = 16800;                    // To count 1 second 
+  TimeBaseInit_lidar.TIM_ClockDivision = 0x0000;            // is not used
+  TimeBaseInit_lidar.TIM_RepetitionCounter = 0x0000;        // is not used
+
+  TIM_TimeBaseInit(TIM7, &TimeBaseInit_lidar);            // Initialize TIM2
+  TIM_Cmd(TIM7, ENABLE);
+
+
+
   USART1ReceiveHandle=xSemaphoreCreateMutex();
   if(USART1ReceiveHandle== NULL)
   {
