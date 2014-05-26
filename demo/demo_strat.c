@@ -19,7 +19,8 @@ void demo_strat_task(void *data)
 
   while(presence_tirette());
 
-  trajectory_goto_d_mm(t, 1000);
+  trajectory_goto_a_rel_deg(t, 360);
+  //trajectory_goto_d_mm(t, 1000);
 
   for(;;) {
 
