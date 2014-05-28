@@ -82,7 +82,7 @@ int main(void) {
   // Setting up position manager
   position_init();
   position_set_tick_per_meter(1170);
-  position_set_axle_track_mm(235);
+  position_set_axle_track_mm(237);
 
   // Launching control system
   control_system_start(&am);
