@@ -23,6 +23,9 @@
 #include "demo/demo_red_side_homologation.h"
 #include "demo/demo_yellow_side_homologation.h"
 
+#include "demo/demo_red_side_strategy.h"
+#include "demo/demo_yellow_side_strategy.h"
+
 #include "control_system.h"
 #include "trajectory_manager.h"
 
@@ -44,8 +47,6 @@ void foutre_les_fresque();
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle);
 void lidar_detect_in_circle();
 void relay_counter();
-void red_side_strategy();
-void yellow_side_strategy();
 void draw_square();
 
 volatile struct ausbee_lidar_data data[AUSBEE_LIDAR_PICCOLO_DATA_LENGTH];
@@ -107,10 +108,15 @@ int main(void) {
   //control_system_debug_start(&am);
   
   if(couleur_depart()==COULEUR_JAUNE)
-    demo_yellow_side_homologation_start(&t);
+  {
+    demo_yellow_side_strategy_start(&t);
+    //demo_yellow_side_homologation_start(&t);
+  }
   else if(couleur_depart()==COULEUR_ROUGE)
-    demo_red_side_homologation_start(&t);
-  vTaskStartScheduler();
+  {
+    demo_red_side_strategy_start(&t);
+    //demo_red_side_homologation_start(&t);
+  }vTaskStartScheduler();
 
   for(;;) {
 
@@ -218,52 +224,6 @@ void test()
   while(1);
 }
 
-void red_side_strategy()
-{
-  while(presence_tirette())
-    ;
-  enable_turbine();
-  trajectory_goto_d_mm(&t, 150);
-  trajectory_goto_a_rel_deg(&t, 45);
-  while(!trajectory_is_ended(&t))
-    ;
-  ouvrir_bras_droit();
-  vTaskDelay(50);
-  trajectory_goto_a_rel_deg(&t, -45);
-  trajectory_goto_d_mm(&t, 210);
-  trajectory_goto_a_rel_deg(&t, 25);
-  while(!trajectory_is_ended(&t))
-    ;
-  trajectory_goto_d_mm(&t, 400);
-  fermer_bras_droit();
-  trajectory_goto_a_rel_deg(&t, 55);
-  trajectory_goto_d_mm(&t, 100);
-  while(!trajectory_is_ended(&t))
-    ;
-  ouvrir_bras_droit();
-  vTaskDelay(75);
-  fermer_bras_droit();
-  vTaskDelay(75);
-  trajectory_goto_a_rel_deg(&t, 80);
-  trajectory_goto_d_mm(&t, 400);
-  //TODO : Add lauch ball
-  trajectory_goto_a_rel_deg(&t, -80);
-  trajectory_goto_d_mm(&t, 400);
-  trajectory_goto_a_rel_deg(&t, 90);
-  trajectory_goto_d_mm(&t, 200);
-  trajectory_goto_a_rel_deg(&t, 180);
-  //TODO: add remove from stack
-  //while(contact_fresque)
-  trajectory_goto_d_mm(&t, -1000);
-  while(!trajectory_is_ended(&t))
-    ;
-  placer_peinture_ausbee();
-  placer_peinture_canon();
-  vTaskDelay(100);
-  trajectory_goto_d_mm(&t, 500);  
-
-}
-
 void draw_square()
 {
   trajectory_goto_d_mm(&t, 400);
@@ -283,76 +243,6 @@ void draw_square()
   trajectory_goto_a_rel_deg(&t,90);
   while(!trajectory_is_ended(&t));
   //trajectory_goto_d_mm(&t, -1000);
-}
-
-void yellow_side_strategy()
-{
-  while(presence_tirette())
-    ;
-  enable_turbine();
-  trajectory_goto_d_mm(&t, 150);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_a_rel_deg(&t, -45);
-  while(!trajectory_is_ended(&t))
-    ;
-  ouvrir_bras_gauche();
-  vTaskDelay(50);
-  trajectory_goto_a_rel_deg(&t, 45);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_d_mm(&t, 120);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_a_rel_deg(&t, -30);
-  while(!trajectory_is_ended(&t))
-    ;
-  trajectory_goto_d_mm(&t, 250);
-  vTaskDelay(150);
-  fermer_bras_gauche();
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_a_rel_deg(&t, -60);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_d_mm(&t, 100);
-  while(!trajectory_is_ended(&t))
-    ;
-  ouvrir_bras_gauche();
-  vTaskDelay(75);
-  fermer_bras_gauche();
-  vTaskDelay(75);
-  trajectory_goto_a_rel_deg(&t, -80);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_d_mm(&t, 280);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_a_rel_deg(&t, 80);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_d_mm(&t, 250);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_a_rel_deg(&t, 90);
-  while(!trajectory_is_ended(&t));
-  lancer_une_balle();
-  //vTaskDelay(400);
-  trajectory_goto_a_rel_deg(&t, 10);
-  while(!trajectory_is_ended(&t));
-  lancer_une_balle();
-  //vTaskDelay(400);
-  trajectory_goto_a_rel_deg(&t, -100);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_d_mm(&t, 800);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_a_rel_deg(&t, -90);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_d_mm(&t, 200);
-  while(!trajectory_is_ended(&t));
-  trajectory_goto_a_rel_deg(&t, -180);
-  while(!trajectory_is_ended(&t));
-  //TODO: add remove from stack
-  //while(contact_fresque)
-  trajectory_goto_d_mm(&t, -1000);
-  while(contact_fresque()==0)
-    ;
-  placer_peinture_ausbee();
-  placer_peinture_canon();
-  vTaskDelay(100);
-  trajectory_goto_d_mm(&t, 500);  
-  while(!trajectory_is_ended(&t));
 }
 
 void asserv_tempo()
