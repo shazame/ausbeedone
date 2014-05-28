@@ -94,7 +94,7 @@ int main(void) {
   init_gpio_robot();
   init_turbine();
   init_servo_position_depart();
-  xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
+  //xTaskCreate(test, (const signed char *)"TEST", 400, NULL, 1, NULL );
   //xTaskCreate(move_zqsd, (const signed char *)"MOVE", 400, NULL, 1, NULL );
   xTaskCreate(blink_led, (const signed char*)"BLINK_LED",100,NULL,1,NULL);
   //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
@@ -116,7 +116,7 @@ void blink_led()
 {
   for(;;)
   {
-    vTaskDelay(50);
+    vTaskDelay(1000/portTICK_RATE_MS);
     platform_led_toggle(PLATFORM_LED0);
   }
 }
@@ -155,8 +155,8 @@ void turbine()
 
 void test()
 {
+ // trajectory_goto_d_mm(&t, 1000);
   //draw_square();
-  yellow_side_strategy();
   while(1)
     ;  
   //asserv_tempo();
@@ -566,6 +566,8 @@ void lidar_detect_in_circle()
               printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
               printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
               obstacle=1;
+              //trajectory_pause(&t);
+              platform_led_set(PLATFORM_LED6);
             }
           }
         }
@@ -601,8 +603,9 @@ void lidar_detect_in_circle()
         }
       }
     }
+    //trajectory_resume(&t);
     obstacle=0;
-
+    platform_led_reset(PLATFORM_LED6);
   }
 }
 void move_zqsd()
