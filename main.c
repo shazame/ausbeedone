@@ -20,6 +20,9 @@
 #include "utils/position_manager.h"
 #include "utils/control_system_debug.h"
 
+#include "demo/demo_red_side_homologation.h"
+#include "demo/demo_yellow_side_homologation.h"
+
 #include "control_system.h"
 #include "trajectory_manager.h"
 
@@ -87,10 +90,9 @@ int main(void) {
   trajectory_init(&t, &am);
   trajectory_start(&t);
 
-  //init_timer_relais();
+  init_timer_relais();
   init_can();
   init_lidar();
-  //init_servo();
   init_gpio_robot();
   init_turbine();
   init_servo_position_depart();
@@ -99,10 +101,15 @@ int main(void) {
   xTaskCreate(blink_led, (const signed char*)"BLINK_LED",100,NULL,1,NULL);
   //xTaskCreate(turbine, (const signed char*)"TURBINE",350,NULL,1,NULL);
   xTaskCreate(lidar_detect_in_circle,(const signed char*)"LIDAR",350,NULL,1,NULL);
-  //xTaskCreate(relay_counter, (const signed char*)"RELAY",100,NULL,1,NULL);
+  xTaskCreate(relay_counter, (const signed char*)"RELAY",100,NULL,1,NULL);
   //demo_strat_start(&t);
   //cli_start(&t);
   //control_system_debug_start(&am);
+  
+  if(couleur_depart()==COULEUR_JAUNE)
+    demo_yellow_side_homologation_start(&t);
+  else if(couleur_depart()==COULEUR_ROUGE)
+    demo_red_side_homologation_start(&t);
   vTaskStartScheduler();
 
   for(;;) {
@@ -124,7 +131,7 @@ void blink_led()
 void relay_counter()
 {
   //Remplacer la condition par la tirette
-  while(contact_fresque()!=1)
+  while(presence_tirette())
     ;
   elapsed_time=0;
   platform_led_set(PLATFORM_LED1);
@@ -155,7 +162,9 @@ void turbine()
 
 void test()
 {
- // trajectory_goto_d_mm(&t, 1000);
+  while(presence_tirette())
+    ;
+  trajectory_goto_d_mm(&t, 1000);
   //draw_square();
   while(1)
     ;  
@@ -566,7 +575,7 @@ void lidar_detect_in_circle()
               printf("obstacle detecté position: x: %lf y: %lf \r\n",x,y);
               printf("angle: %d distance: %d \r\n", data[i].angle, data[i].distance_mm);
               obstacle=1;
-              //trajectory_pause(&t);
+              trajectory_pause(&t);
               platform_led_set(PLATFORM_LED6);
             }
           }
@@ -603,7 +612,7 @@ void lidar_detect_in_circle()
         }
       }
     }
-    //trajectory_resume(&t);
+    trajectory_resume(&t);
     obstacle=0;
     platform_led_reset(PLATFORM_LED6);
   }
