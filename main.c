@@ -20,6 +20,7 @@
 #include "utils/control_system_debug.h"
 
 #include "demo/demo_square.h"
+#include "demo/demo_square_reverse.h"
 #include "demo/demo_circle.h"
 #include "demo/demo_strat.h"
 
@@ -82,6 +83,7 @@ int main(void)
 
   // Launching a demonstration
   //demo_square_start(&t);
+  //demo_square_reverse_start(&t);
   //demo_circle_start(&t);
   demo_strat_start(&t);
 
