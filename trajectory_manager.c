@@ -62,22 +62,22 @@ uint32_t trajectory_get_last_id(struct trajectory_manager *t)
 
 /******************** Movement functions ********************/
 
-void trajectory_pause(struct trajectory_manager *t)
-{
-  struct trajectory_dest dest;
-
-  dest.type = PAUSE;
-
-  trajectory_add_point(t, dest, NOW);
-
-  /* Force update now to stop more quickly */
-  trajectory_update(t);
-}
-
 static int trajectory_is_paused(struct trajectory_manager *t)
 {
   return (!trajectory_is_ended(t) &&
           (t->points[t->cur_id].type == PAUSE));
+}
+
+void trajectory_pause(struct trajectory_manager *t)
+{
+  if (!trajectory_is_paused(t)) {
+      struct trajectory_dest dest;
+      dest.type = PAUSE;
+      trajectory_add_point(t, dest, NOW);
+  }
+
+  /* Force update now to stop more quickly */
+  trajectory_update(t);
 }
 
 void trajectory_resume(struct trajectory_manager *t)
@@ -175,7 +175,7 @@ void trajectory_add_point(struct trajectory_manager *t,
   }
 }
 
-void trajectory_manage_order_d(struct trajectory_manager *t,
+static void trajectory_manage_order_d(struct trajectory_manager *t,
                                struct trajectory_dest *p)
 {
   float d_mm_ref = p->starting_d_mm + p->d.mm;
@@ -187,7 +187,7 @@ void trajectory_manage_order_d(struct trajectory_manager *t,
   }
 }
 
-void trajectory_manage_order_a_abs(struct trajectory_manager *t,
+static void trajectory_manage_order_a_abs(struct trajectory_manager *t,
                                    struct trajectory_dest *p)
 {
   // TODO: Better handle
@@ -199,7 +199,7 @@ void trajectory_manage_order_a_abs(struct trajectory_manager *t,
   }
 }
 
-void trajectory_manage_order_a_rel(struct trajectory_manager *t,
+static void trajectory_manage_order_a_rel(struct trajectory_manager *t,
                                    struct trajectory_dest *p)
 {
   float a_deg_ref = p->starting_a_deg + p->a.deg;
@@ -209,6 +209,13 @@ void trajectory_manage_order_a_rel(struct trajectory_manager *t,
   else {
     control_system_set_angle_deg_ref(t->cs, a_deg_ref);
   }
+}
+
+static void trajectory_manage_order_pause(struct trajectory_manager *t,
+                                          struct trajectory_dest *p)
+{
+  control_system_set_distance_mm_ref(t->cs, p->starting_d_mm);
+  control_system_set_angle_deg_ref(t->cs, p->starting_a_deg);
 }
 
 inline void trajectory_update(struct trajectory_manager *t)
@@ -238,6 +245,9 @@ inline void trajectory_update(struct trajectory_manager *t)
       break;
     case A_REL:
       trajectory_manage_order_a_rel(t, p);
+      break;
+    case PAUSE:
+      trajectory_manage_order_pause(t, p);
       break;
     default:
       break;
