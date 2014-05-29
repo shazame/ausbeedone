@@ -14,17 +14,22 @@
 
 #include <AUSBEE/l298_driver.h>
 
+#include "utils/define.h"
 #include "utils/init.h"
+#include "utils/actions.h"
 #include "utils/motors_wrapper.h"
 #include "utils/position_manager.h"
 #include "utils/control_system_debug.h"
 #include "utils/lidar_detect.h"
+#include "utils/relay_counter.h"
 
 #include "demo/demo_square.h"
 #include "demo/demo_square_reverse.h"
 #include "demo/demo_circle.h"
 #include "demo/demo_strat.h"
 #include "demo/demo_fresque.h"
+#include "demo/demo_yellow_side_strategy.h"
+#include "demo/demo_red_side_strategy.h"
 
 #include "control_system.h"
 #include "trajectory_manager.h"
@@ -34,6 +39,7 @@
 volatile uint8_t elapsed_time = 0;
 // Private function prototypes
 void blink1();
+void strategy_start();
 // Global variables
 struct control_system am;
 struct trajectory_manager t;
@@ -54,8 +60,10 @@ int main(void)
   platform_usart_init(USART_DEBUG, 115200);
   platform_led_init();
 
-  //init_servo_position_depart();
-  //init_gpio_robot();
+  init_can();
+  init_servo_position_depart();
+  init_gpio_robot();
+  init_turbine();
 
   // Encoders setup
   init_encoders();
@@ -73,6 +81,8 @@ int main(void)
 
   // Launching control system
   control_system_start(&am);
+  // With debug output
+  control_system_debug_start(&am);
 
   // Launching trajectory manager
   trajectory_init(&t, &am);
@@ -80,6 +90,9 @@ int main(void)
 
   // Starting detection system
   lidar_detect_start(&t);
+
+  // Starting system to stop the robot after 90 seconds
+  relay_counter_start();
 
   xTaskCreate(blink1, (const signed char *)"LED1", 100, NULL, 1, NULL );
 
@@ -90,10 +103,10 @@ int main(void)
   //demo_square_start(&t);
   //demo_square_reverse_start(&t);
   //demo_circle_start(&t);
-  demo_strat_start(&t);
+  //demo_strat_start(&t);
   //demo_fresque_start(&t);
 
-  control_system_debug_start(&am);
+  strategy_start();
 
   vTaskStartScheduler();
 
@@ -110,5 +123,17 @@ void blink1(void)
     platform_led_toggle(PLATFORM_LED0);
 
     vTaskDelay(1000 / portTICK_RATE_MS);
+  }
+}
+
+void strategy_start(void)
+{
+  if(couleur_depart()==COULEUR_JAUNE)
+  {
+    demo_yellow_side_strategy_start(&t);
+  }
+  else if(couleur_depart()==COULEUR_ROUGE)
+  {
+    demo_red_side_strategy_start(&t);
   }
 }

@@ -55,7 +55,7 @@
 #define GPIO_CONTACT_CANON      GPIO9
 
 //Couleur de départ
-#define COULEUR_JAUNE 0     // A VERIFIER
-#define COULEUR_ROUGE 1     // A VERIFIER
+#define COULEUR_JAUNE 0
+#define COULEUR_ROUGE 1
 
 #endif //UTILS_DEFINE_H
