@@ -20,6 +20,8 @@ extern volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
 
 extern xSemaphoreHandle USART1ReceiveHandle;
 
+static uint8_t lidar_detect_enabled = 1;
+
 void lidar_detect_task(void *data);
 
 void lidar_detect_start(struct trajectory_manager *t)
@@ -58,6 +60,9 @@ void lidar_detect_task(void *data)
 //    --> center is 10.5cm far from the lidar, aligned with it.
 uint8_t lidar_detect_obstacle(void)
 {
+  if (!lidar_detect_enabled)
+    return 0;
+
   if(xSemaphoreTake(USART1ReceiveHandle,100)==pdTRUE)
   {
     ausbee_lidar_parse_piccolo(buffer,data);
@@ -85,4 +90,14 @@ uint8_t lidar_detect_obstacle(void)
     }
   }
   return 0;
+}
+
+void lidar_detect_enable(void)
+{
+  lidar_detect_enabled = 1;
+}
+
+void lidar_detect_disable(void)
+{
+  lidar_detect_enabled = 0;
 }
