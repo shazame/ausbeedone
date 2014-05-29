@@ -9,6 +9,9 @@
 #include "utils/position_manager.h"
 #include "cli.h"
 
+#include "demo/demo_yellow_side_strategy.h"
+#include "demo/demo_red_side_strategy.h"
+
 void cli_task(void *);
 
 void cli_start(struct trajectory_manager *t)
@@ -86,7 +89,7 @@ void cli_task(void *data)
       cli_getstr(arg, ARG_LENGTH);
       value = cli_getfloat();
     }
-    else if (command == 'm') {
+    else if (command == 'm' || command == 'r') {
       cli_getstr(arg, ARG_LENGTH);
       cli_getstr(arg2, ARG_LENGTH);
     }
@@ -101,6 +104,37 @@ void cli_task(void *data)
     else if (command == 'a') {
       trajectory_goto_a_rel_deg(t, value);
       printf("Angle: %f\r\n", (double)value);
+    }
+    else if (command == 'r'){
+      if (!strncmp(arg, "ys", ARG_LENGTH)) {
+        if (!strncmp(arg2, "start", ARG_LENGTH)) {
+          demo_yellow_side_strategy_start(t);
+          printf("Starting strategy for yellow side.\r\n");
+        }
+        else if (!strncmp(arg2, "stop", ARG_LENGTH)) {
+          demo_yellow_side_strategy_stop();
+          printf("Ending strategy for yellow side.\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg2);
+        }
+      }
+      else if (!strncmp(arg, "rs", ARG_LENGTH)) {
+        if (!strncmp(arg2, "start", ARG_LENGTH)) {
+          demo_red_side_strategy_start(t);
+          printf("Starting strategy for red side.\r\n");
+        }
+        else if (!strncmp(arg2, "stop", ARG_LENGTH)) {
+          demo_red_side_strategy_stop();
+          printf("Ending strategy for red side.\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg2);
+        }
+      }
+      else {
+        printf("Invalid argument '%s'.\r\n", arg);
+      }
     }
     else if (command == 's') {
       if (!strncmp(arg, "speed_high", ARG_LENGTH)) {
@@ -250,6 +284,13 @@ void cli_task(void *data)
       printf("  Available commands are:\r\n");
       printf("  d <float>: Go forward/backward with the specified distance in mm.\r\n");
       printf("  a <float>: Rotate with the specified angle in degrees.\r\n");
+      printf("  r <arg> <arg2>: Start/stop a task.\r\n");
+      printf("             <arg> can be one of:\r\n");
+      printf("             yellow_strat: Yellow strategy task.\r\n");
+      printf("             red_strat : Red strategy task.\r\n");
+      printf("             <arg2> can be one of:\r\n");
+      printf("             start: Start the task.\r\n");
+      printf("             stop : Stop the task.\r\n");
       printf("  s <arg> <value>:   Set internal value.\r\n");
       printf("             <value> should be a float.\r\n");
       printf("             <arg> can be one of:\r\n");
