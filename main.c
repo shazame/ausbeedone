@@ -23,6 +23,7 @@
 #include "demo/demo_square_reverse.h"
 #include "demo/demo_circle.h"
 #include "demo/demo_strat.h"
+#include "demo/demo_fresque.h"
 
 #include "control_system.h"
 #include "trajectory_manager.h"
@@ -86,6 +87,7 @@ int main(void)
   //demo_square_reverse_start(&t);
   //demo_circle_start(&t);
   demo_strat_start(&t);
+  //demo_fresque_start(&t);
 
   control_system_debug_start(&am);
 
