@@ -18,6 +18,7 @@
 #include "utils/motors_wrapper.h"
 #include "utils/position_manager.h"
 #include "utils/control_system_debug.h"
+#include "utils/lidar_detect.h"
 
 #include "demo/demo_square.h"
 #include "demo/demo_square_reverse.h"
@@ -76,6 +77,9 @@ int main(void)
   // Launching trajectory manager
   trajectory_init(&t, &am);
   trajectory_start(&t);
+
+  // Starting detection system
+  lidar_detect_start(&t);
 
   xTaskCreate(blink1, (const signed char *)"LED1", 100, NULL, 1, NULL );
 
