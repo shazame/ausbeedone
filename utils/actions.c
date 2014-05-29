@@ -66,7 +66,7 @@ void disable_power_relay(void)
 void move_servo_from_servo_module(uint8_t servo, uint8_t angle)
 {
   angle = (angle > 100) ? 100 : angle;
-  printf("angle :%d \r\n", angle);
+  //printf("angle :%d \r\n", angle);
   CanTxMsg CAN_Tx;
   uint8_t mailbox_number = 0;
   if(servo & SERVO_FROM_MODULE_0)
