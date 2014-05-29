@@ -66,7 +66,7 @@ void demo_yellow_side_strategy_task(void* data)
   trajectory_goto_a_rel_deg(t, -12);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, -12);
+  trajectory_goto_a_rel_deg(t, 14);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
   trajectory_goto_a_rel_deg(t, -12);
@@ -77,10 +77,10 @@ void demo_yellow_side_strategy_task(void* data)
   trajectory_goto_a_rel_deg(t, 14);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, 16);
+  trajectory_goto_a_rel_deg(t, -12);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, 96);
+  trajectory_goto_a_rel_deg(t, 98);
   while(!trajectory_is_ended(t));
   disable_turbine();
   trajectory_goto_d_mm(t, 650);
