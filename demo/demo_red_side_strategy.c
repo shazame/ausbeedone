@@ -10,11 +10,21 @@
 
 extern volatile uint8_t enable_detection;
 
+static xTaskHandle xHandle = NULL;
+
 void demo_red_side_strategy_task(void * data);
 
 void demo_red_side_strategy_start(struct trajectory_manager *t)
 {
-  xTaskCreate(demo_red_side_strategy_task, (const signed char *)"DemoYellowSideHomologation", 200, (void *)t, 1, NULL );
+  xTaskCreate(demo_red_side_strategy_task, (const signed char *)"DemoRedSideHomologation", 200, (void *)t, 1, &xHandle);
+}
+
+void demo_red_side_strategy_stop(void)
+{
+  if (xHandle != NULL) {
+    vTaskDelete(xHandle);
+  }
+  xHandle = NULL;
 }
 
 void demo_red_side_strategy_task(void* data)
