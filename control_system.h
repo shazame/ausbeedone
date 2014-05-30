@@ -22,8 +22,8 @@
 #define DISTANCE_MAX_SPEED 240 // in mm/s
 #define DISTANCE_MAX_ACC   300 // in mm/s^2
 
-#define ANGLE_MAX_SPEED_DEG 112 // in deg/s
-#define ANGLE_MAX_ACC_DEG   112 // in deg/s^2
+#define ANGLE_MAX_SPEED_DEG 90 // in deg/s
+#define ANGLE_MAX_ACC_DEG   105 // in deg/s^2
 
 struct control_system {
   struct ausbee_cs csm_right_motor;

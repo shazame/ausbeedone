@@ -22,11 +22,21 @@
 #define PI 3.1415926535
 #define DEG2RAD(a) ((a) * PI / 180.0)
 
+#ifdef UNUSED
+#elif defined(__GNUC__)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ x
+#else
+# define UNUSED(x) x
+#endif
+
 void control_system_task(void *data);
 static void control_system_set_motors_ref(struct control_system *am, float d_mm, float theta);
 static void control_system_set_distance_mm_diff(void *am, float ref);
 static void control_system_set_angle_rad_diff(void *am, float ref);
 
+/*
 static void control_system_init_motors(struct control_system *am)
 {
   ausbee_pid_init(&(am->pid_right_motor), 2, 0, 0);
@@ -58,11 +68,12 @@ static void control_system_init_motors(struct control_system *am)
   ausbee_cs_set_process_command(&(am->csm_right_motor), motors_wrapper_right_motor_set_duty_cycle, NULL);
   ausbee_cs_set_process_command(&(am->csm_left_motor), motors_wrapper_left_motor_set_duty_cycle, NULL);
 }
+*/
 
 static void control_system_init_distance_angle(struct control_system *am)
 {
   ausbee_pid_init(&(am->pid_distance), 2.5, 0.5, 0.5);
-  ausbee_pid_init(&(am->pid_angle),    3, 0.05, 0);
+  ausbee_pid_init(&(am->pid_angle),    3, 0.05, 0); // 2, 0.07, 0.1
 
   ausbee_pid_set_output_range(&(am->pid_distance), -100, 100);
   ausbee_pid_set_output_range(&(am->pid_angle),  -100, 100);
@@ -134,7 +145,7 @@ void control_system_task(void *data)
   }
 }
 
-static void control_system_set_motors_ref(struct control_system *am, float d_mm, float theta)
+static void control_system_set_motors_ref(struct control_system *UNUSED(am), float d_mm, float theta)
 {
   uint32_t axle_track_mm = position_get_axle_track_mm();
 
