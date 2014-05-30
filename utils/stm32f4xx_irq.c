@@ -115,7 +115,7 @@ void TIM2_IRQHandler(void)
   if(TIM_GetITStatus(TIM2,TIM_IT_Update) == SET)
   {
     elapsed_time++;
-    platform_led_toggle(PLATFORM_LED7);
+    //platform_led_toggle(PLATFORM_LED7);
     TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   }
 }

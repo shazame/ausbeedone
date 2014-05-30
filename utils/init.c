@@ -79,8 +79,8 @@ void init_mot(struct ausbee_l298_chip* mot2, struct ausbee_l298_chip* mot1)
   enum AUSBEE_L298_DRIVER_ERROR error;
   platform_motor2_init_io();
   error=ausbee_l298_init_chip(*mot2);
-  if (error==ENO_ERROR)
-    platform_led_toggle(PLATFORM_LED1);
+  //if (error==ENO_ERROR)
+  //  platform_led_toggle(PLATFORM_LED1);
   ausbee_l298_enable_chip(*mot2, 1);
 
   mot1->timer_channel=1;
@@ -92,8 +92,8 @@ void init_mot(struct ausbee_l298_chip* mot2, struct ausbee_l298_chip* mot1)
   mot1->TIMx=TIM9;
   platform_motor1_init_io();
   error=ausbee_l298_init_chip(*mot1);
-  if (error==ENO_ERROR)
-    platform_led_toggle(PLATFORM_LED2);
+  //if (error==ENO_ERROR)
+  //  platform_led_toggle(PLATFORM_LED2);
   ausbee_l298_enable_chip(*mot1, 1);
 
 }
@@ -184,7 +184,7 @@ void init_lidar()
   USART1ReceiveHandle=xSemaphoreCreateMutex();
   if(USART1ReceiveHandle== NULL)
   {
-    platform_led_toggle(PLATFORM_LED6);
+    //platform_led_toggle(PLATFORM_LED6);
   }
 }
 

@@ -32,14 +32,14 @@ void relay_counter_task(void *UNUSED(dummy))
   while(presence_tirette())
     ;
   elapsed_time=0;
-  platform_led_set(PLATFORM_LED1);
+  //platform_led_set(PLATFORM_LED1);
   while(1)
   {
     if (elapsed_time>=88)
     {
       // Shutdown power
       disable_power_relay();
-      platform_led_set(PLATFORM_LED6);
+      //platform_led_set(PLATFORM_LED6);
     }
   }
 }

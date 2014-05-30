@@ -46,10 +46,12 @@ void lidar_detect_task(void *data)
     {
       if (lidar_detect_obstacle()) {
         TIM_SetCounter(TIM7,0);
+        platform_led_reset(PLATFORM_LED1);
       }
     }
     trajectory_resume(t);
     platform_led_reset(PLATFORM_LED6);
+    platform_led_reset(PLATFORM_LED1);
   }
 }
 
