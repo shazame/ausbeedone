@@ -15,6 +15,7 @@
 
 #include "position_manager.h"
 #include "motors_wrapper.h"
+#include "actions.h"
 
 // extern global variables
 //usart
@@ -115,7 +116,10 @@ void TIM2_IRQHandler(void)
   if(TIM_GetITStatus(TIM2,TIM_IT_Update) == SET)
   {
     elapsed_time++;
-    //platform_led_toggle(PLATFORM_LED7);
+    if (elapsed_time>=88)
+    {
+      disable_power_relay();
+    }
     TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   }
 }

@@ -30,10 +30,6 @@ void demo_yellow_side_strategy_stop(void)
 void demo_yellow_side_strategy_task(void* data)
 {
   struct trajectory_manager *t =(struct trajectory_manager *) data;
-  while(!presence_tirette())
-    ;
-  while(presence_tirette())
-    ;
   enable_turbine();
   trajectory_goto_d_mm(t, 150);
   while(!trajectory_is_ended(t));

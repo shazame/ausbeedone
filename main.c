@@ -21,7 +21,6 @@
 #include "utils/position_manager.h"
 #include "utils/control_system_debug.h"
 #include "utils/lidar_detect.h"
-#include "utils/relay_counter.h"
 
 #include "demo/demo_square.h"
 #include "demo/demo_square_reverse.h"
@@ -36,7 +35,6 @@
 
 #include "cli.h"
 
-volatile uint8_t elapsed_time = 0;
 // Private function prototypes
 void blink1();
 void strategy_start();
@@ -49,6 +47,7 @@ int32_t right_motor_ref = 0;
 int32_t left_motor_ref = 0;
 
 volatile unsigned char buffer[AUSBEE_LIDAR_PICCOLO_FRAME_LENGTH];
+volatile uint8_t elapsed_time = 0;
 xSemaphoreHandle USART1ReceiveHandle;
 xSemaphoreHandle CANReceiveSemaphore;
 CanRxMsg CAN_RxStruct;
@@ -64,6 +63,7 @@ int main(void)
   init_servo_position_depart();
   init_gpio_robot();
   init_turbine();
+  init_timer_relais();
 
   // Encoders setup
   init_encoders();
@@ -90,9 +90,6 @@ int main(void)
 
   // Starting detection system
   lidar_detect_start(&t);
-
-  // Starting system to stop the robot after 90 seconds
-  relay_counter_start();
 
   xTaskCreate(blink1, (const signed char *)"LED1", 100, NULL, 1, NULL );
 
@@ -128,6 +125,13 @@ void blink1(void)
 
 void strategy_start(void)
 {
+  while(!presence_tirette())
+    ;
+  while(presence_tirette())
+    ;
+
+  elapsed_time = 0;
+
   if(couleur_depart()==COULEUR_JAUNE)
   {
     demo_yellow_side_strategy_start(&t);
