@@ -76,7 +76,7 @@ void demo_red_side_strategy_task(void* data)
   trajectory_goto_a_rel_deg(t, 12);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, 12);
+  trajectory_goto_a_rel_deg(t, -14);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
   trajectory_goto_a_rel_deg(t, 12);
@@ -84,13 +84,13 @@ void demo_red_side_strategy_task(void* data)
   lancer_une_balle();
   trajectory_goto_d_mm(t, 50);
   while(!trajectory_is_ended(t));
-  trajectory_goto_a_rel_deg(t, -14);
+  trajectory_goto_a_rel_deg(t, 14);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, -16);
+  trajectory_goto_a_rel_deg(t, -12);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, -96);
+  trajectory_goto_a_rel_deg(t, -98);
   while(!trajectory_is_ended(t));
   disable_turbine();
   trajectory_goto_d_mm(t, 650);
@@ -115,5 +115,6 @@ void demo_red_side_strategy_task(void* data)
   lidar_detect_enable();
   trajectory_goto_d_mm(t, 500);  
   while(!trajectory_is_ended(t));
+  while(1);
 }
 
