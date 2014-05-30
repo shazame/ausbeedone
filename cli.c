@@ -11,6 +11,7 @@
 
 #include "demo/demo_yellow_side_strategy.h"
 #include "demo/demo_red_side_strategy.h"
+#include "demo/demo_pid.h"
 
 void cli_task(void *);
 
@@ -106,7 +107,33 @@ void cli_task(void *data)
       printf("Angle: %f\r\n", (double)value);
     }
     else if (command == 'r'){
-      if (!strncmp(arg, "ys", ARG_LENGTH)) {
+      if (!strncmp(arg, "pid", ARG_LENGTH)) {
+        if (!strncmp(arg2, "start", ARG_LENGTH)) {
+          demo_pid_start(t, 1);
+          printf("Starting PID test.\r\n");
+        }
+        else if (!strncmp(arg2, "stop", ARG_LENGTH)) {
+          demo_pid_stop();
+          printf("Ending PID test.\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg2);
+        }
+      }
+      else if (!strncmp(arg, "pidi", ARG_LENGTH)) {
+        if (!strncmp(arg2, "start", ARG_LENGTH)) {
+          demo_pid_start(t, -1);
+          printf("Starting PID test.\r\n");
+        }
+        else if (!strncmp(arg2, "stop", ARG_LENGTH)) {
+          demo_pid_stop();
+          printf("Ending PID test.\r\n");
+        }
+        else {
+          printf("Invalid argument '%s'.\r\n", arg2);
+        }
+      }
+      else if (!strncmp(arg, "ys", ARG_LENGTH)) {
         if (!strncmp(arg2, "start", ARG_LENGTH)) {
           demo_yellow_side_strategy_start(t);
           printf("Starting strategy for yellow side.\r\n");
@@ -286,8 +313,9 @@ void cli_task(void *data)
       printf("  a <float>: Rotate with the specified angle in degrees.\r\n");
       printf("  r <arg> <arg2>: Start/stop a task.\r\n");
       printf("             <arg> can be one of:\r\n");
-      printf("             yellow_strat: Yellow strategy task.\r\n");
-      printf("             red_strat : Red strategy task.\r\n");
+      printf("             ys: Yellow strategy task.\r\n");
+      printf("             rs: Red strategy task.\r\n");
+      printf("             pid: PID test task.\r\n");
       printf("             <arg2> can be one of:\r\n");
       printf("             start: Start the task.\r\n");
       printf("             stop : Stop the task.\r\n");
@@ -327,12 +355,7 @@ void cli_task(void *data)
       printf("             enc_r:    print right encoder's value.\r\n");
       printf("             cur_id:   print position manager's current point id.\r\n");
       printf("             last_id:  print position manager's last point id.\r\n");
-      printf("             pid_d_P : print distance PID proportional value.\r\n");
-      printf("             pid_d_I : print distance PID integral value.\r\n");
-      printf("             pid_d_D : print distance PID derivative value.\r\n");
-      printf("             pid_a_P : print angle PID proportional value.\r\n");
-      printf("             pid_a_I : print angle PID integral value.\r\n");
-      printf("             pid_a_D : print angle PID derivative value.\r\n");
+      printf("             pid_dump: print PID.\r\n");
       printf("  h: Display this help.\r\n");
     }
     else {
