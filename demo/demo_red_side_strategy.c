@@ -68,7 +68,7 @@ void demo_red_side_strategy_task(void* data)
   while(!trajectory_is_ended(t));
   trajectory_goto_a_rel_deg(t, -80);
   while(!trajectory_is_ended(t));
-  trajectory_goto_d_mm(t, 220);
+  trajectory_goto_d_mm(t, 270);
   while(!trajectory_is_ended(t));
   trajectory_goto_a_rel_deg(t, -90);
   while(!trajectory_is_ended(t));
@@ -84,13 +84,13 @@ void demo_red_side_strategy_task(void* data)
   lancer_une_balle();
   trajectory_goto_d_mm(t, 50);
   while(!trajectory_is_ended(t));
-  trajectory_goto_a_rel_deg(t, 14);
+  trajectory_goto_a_rel_deg(t, -14);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, -12);
+  trajectory_goto_a_rel_deg(t, 12);
   while(!trajectory_is_ended(t));
   lancer_une_balle();
-  trajectory_goto_a_rel_deg(t, -98);
+  trajectory_goto_a_rel_deg(t, 82);
   while(!trajectory_is_ended(t));
   disable_turbine();
   trajectory_goto_d_mm(t, 650);
