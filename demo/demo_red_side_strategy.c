@@ -105,5 +105,6 @@ void demo_red_side_strategy_task(void* data)
   lidar_detect_enable();
   trajectory_goto_d_mm(t, 500);  
   while(!trajectory_is_ended(t));
+  while(1);
 }
 
