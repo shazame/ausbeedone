@@ -41,24 +41,19 @@ static void cli_getline(char *buff, uint8_t line_length)
 
   memset(buff, 0, line_length * sizeof(char));
 
-  while (((c = cli_getchar()) != EOF)) {
-    if ((char)c == CLI_DEL_CHAR && i > 0) {
-      buff[i--] = 0;
+  while (((c = getchar()) != EOF) && ((char)c != CLI_END_CHAR)) {
+    if ((char)c == CLI_DEL_CHAR) {
+      if (i > 0) {
+        buff[--i] = 0;
+        printf("\b \b");
+      }
     }
-    else if (i < line_length) {
+    else if (i < line_length-1) {
       buff[i++] = (char)c;
-    }
-
-    printf("\r                                                                                  ");
-    if (c != CLI_END_CHAR) {
-      printf("\r$ %s", buff);
-    }
-
-    if ((char)c == CLI_END_CHAR) {
-      printf("\r\n", buff);
-      break;
+      printf("%c", (char)c);
     }
   }
+  printf("\r\n");
 }
 
 static void cli_getstr(char *buff, uint8_t str_length)
