@@ -1,12 +1,12 @@
 Ausbee'Done
 ===========
 
-Fichiers sources de la stratégie pour la Coupe de France de Robotique 2014 de
-l'équipe Ausbee'Done, étudiants en troisième année de l'association Eirbot à
-l'ENSEIRB-MATMECA.
+Fichiers sources de la stratégie de l'équipe Ausbee'Done pour la Coupe de
+France de Robotique, depuis l'année 2014.
 
 Ce projet est basé sur l'architecture *AUSBEE* et utilise la bibliothèque
-*libausbee* que nous avons conçu et dont les sources sont disponibles : https://github.com/Kev-J/ausbee
+*libausbee* que nous avons conçu et dont les sources sont disponibles ici :
+https://github.com/Kev-J/ausbee
 
 Setting up
 ----------
@@ -24,6 +24,11 @@ Once this is done you can get this project's source files:
 `cd ausbee/Software/Project`
 
 `git clone https://github.com/shazame/ausbeedone.git`
+
+If, like us, your want to use FreeRTOS, you should add this line to the file
+`project.mk`:
+
+`PROJECT_INCLUDES += $(FREERTOS_INCLUDES_DIR)`
 
 That's all!
 
