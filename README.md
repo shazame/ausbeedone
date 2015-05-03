@@ -17,11 +17,12 @@ into the desired directory and run:
 `git clone https://github.com/Kev-J/ausbee.git`
 
 Then you need to configure your board, see the instructions in
-`ausbee/Software/README`.
+`ausbee/README`. Be careful to add `-lm` as linker flag (Toolchain) to use the
+math library.
 
 Once this is done you can get this project's source files:
 
-`cd ausbee/Software/Project`
+`cd ausbee/Project`
 
 `git clone https://github.com/shazame/ausbeedone.git`
 
