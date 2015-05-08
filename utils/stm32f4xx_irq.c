@@ -13,6 +13,7 @@
 
 #include <AUSBEE/lidar.h>
 
+#include "define.h"
 #include "position_manager.h"
 #include "motors_wrapper.h"
 #include "actions.h"
@@ -87,6 +88,14 @@ void CAN1_RX0_IRQHandler(void) {
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   if (TIM_GetITStatus(TIM8, TIM_IT_Update) == SET) {
+#ifdef ENCODERS_HAVE_QUADRATURE
+    // Specific operations have to be done to read encoder's value has negative
+    // when moving backward
+    uint16_t left_counter = TIM3->CNT;
+    int16_t left_encoder_diff = *(int16_t *)(&left_counter);
+    uint16_t right_counter = TIM1->CNT;
+    int16_t right_encoder_diff = *(int16_t *)(&right_counter);
+#else
     // Reading encoder value
     int32_t left_encoder_diff = TIM3->CNT;
     int32_t right_encoder_diff = TIM1->CNT;
@@ -99,6 +108,7 @@ void TIM8_UP_TIM13_IRQHandler(void)
     if (!motors_wrapper_right_motor_is_moving_forward()) {
       right_encoder_diff = -right_encoder_diff;
     }
+#endif
 
     // Updating position
     position_update(left_encoder_diff, right_encoder_diff);

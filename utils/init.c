@@ -98,20 +98,25 @@ void init_mot(struct ausbee_l298_chip* mot2, struct ausbee_l298_chip* mot1)
 
 }
 
+#ifdef ENCODERS_HAVE_QUADRATURE
+  #define USE_ENCODER_QUADRATURE 1
+#else
+  #define USE_ENCODER_QUADRATURE 0
+#endif
 void init_encoders(void)
 {
   ausbee_encoder_clock_enable(TIM8);
   ausbee_init_sampling_timer(TIM8, 16800, 1000);
 
+  platform_encoder_init();
+
   // Right encoder
-  platform_encoder1_init();
   ausbee_encoder_clock_enable(TIM1);
-  ausbee_encoder_init_timer(TIM1);
+  ausbee_encoder_init_timer(TIM1, USE_ENCODER_QUADRATURE);
 
   // Left encoder
-  platform_encoder2_init();
   ausbee_encoder_clock_enable(TIM3);
-  ausbee_encoder_init_timer(TIM3);
+  ausbee_encoder_init_timer(TIM3, USE_ENCODER_QUADRATURE);
 }
 
 /* initialise la pwm pour la turbine du canon

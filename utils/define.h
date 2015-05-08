@@ -1,6 +1,8 @@
 #ifndef UTILS_DEFINE_H
 #define UTILS_DEFINE_H
 
+// Uncomment if quadrature is available on encoders
+#define ENCODERS_HAVE_QUADRATURE
 
 // Servomoteur sur servo module
 #define SERVO_FROM_MODULE_0 0x01  //canon bas
