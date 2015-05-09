@@ -13,6 +13,8 @@
 #include "demo/demo_red_side_strategy.h"
 #include "demo/demo_pid.h"
 
+char cli_last_buffer[CLI_BUFFER_SIZE] = {0};
+
 void cli_task(void *);
 void cli_execute(char *cmd, struct trajectory_manager *t, uint8_t argc, char **argv);
 
@@ -42,6 +44,15 @@ static void cli_getline(char *buff)
       c = getchar();
       switch (c) {
         case CLI_UP_KEY:
+          if (cli_last_buffer != NULL) {
+            memset(buff, 0, CLI_BUFFER_SIZE * sizeof(char));
+            strncpy(buff, cli_last_buffer, CLI_BUFFER_SIZE);
+            for (; i > 0; i--) {
+              printf("\b \b");
+            }
+            printf("%s", buff);
+            i = strlen(buff);
+          }
           break;
         case CLI_DOWN_KEY:
           break;
@@ -66,6 +77,11 @@ static void cli_getline(char *buff)
       printf("%c", (char)c);
     }
   }
+  // If enter key is pressed before any char is typed, last command is sent
+  if ((buff[0] == 0) && (cli_last_buffer != NULL)) {
+    strncpy(buff, cli_last_buffer, CLI_BUFFER_SIZE);
+    //printf("%s", buff);
+  }
   printf("\r\n");
 }
 
@@ -81,6 +97,7 @@ void cli_task(void *data)
   for (;;) {
     printf("$ ");
     cli_getline(cli_buffer);
+    strncpy(cli_last_buffer, cli_buffer, CLI_BUFFER_SIZE);
 
     // CLI buffer tokenization
     cmd = strtok(cli_buffer, CLI_DELIMITER);
