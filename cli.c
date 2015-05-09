@@ -35,6 +35,32 @@ static void cli_getline(char *buff)
         printf("\b \b");
       }
     }
+    else if ((char)c == CLI_ESC_CHAR) {
+      // ANSI Escape sequence detected
+      if ((char)getchar() != 91) break;
+      // Get arrow key id
+      c = getchar();
+      switch (c) {
+        case CLI_UP_KEY:
+          break;
+        case CLI_DOWN_KEY:
+          break;
+        case CLI_RIGHT_KEY:
+          if (i < CLI_BUFFER_SIZE-1 && buff[i] != 0) {
+            printf("%c", buff[i]);
+            i++;
+          }
+          break;
+        case CLI_LEFT_KEY:
+          if (i > 0) {
+            i--;
+            printf("\b");
+          }
+          break;
+        default:
+          printf("Unknown escape sequence.\r\n");
+      }
+    }
     else if (i < CLI_BUFFER_SIZE-1) {
       buff[i++] = (char)c;
       printf("%c", (char)c);
