@@ -91,10 +91,10 @@ void TIM8_UP_TIM13_IRQHandler(void)
 #ifdef ENCODERS_HAVE_QUADRATURE
     // Specific operations have to be done to read encoder's value has negative
     // when moving backward
-    uint16_t left_counter = TIM3->CNT;
+    uint16_t left_counter = TIM1->CNT;
     int16_t left_encoder_diff = *(int16_t *)(&left_counter);
-    uint16_t right_counter = TIM1->CNT;
-    int16_t right_encoder_diff = *(int16_t *)(&right_counter);
+    uint16_t right_counter = TIM3->CNT;
+    int16_t right_encoder_diff = -*(int16_t *)(&right_counter);
 #else
     // Reading encoder value
     int32_t left_encoder_diff = TIM3->CNT;
