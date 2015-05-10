@@ -191,16 +191,111 @@ void cli_execute_get(struct trajectory_manager *t, uint8_t argc, char **argv)
   }
 }
 
-void cli_execute_set(uint8_t argc, char **argv)
+void cli_execute_set(struct trajectory_manager *t, uint8_t argc, char **argv)
 {
+  if (argc < 2) {
+    printf("Error: the command 'set' needs 2 argument.\r\n");
+  }
+
+  float value = strtof(argv[1], NULL);
+
+  if (cli_streq(argv[0], "speed_high")) {
+    control_system_set_speed_high(t->cs);
+    printf("Max speed.\r\n");
+  }
+  else if (cli_streq(argv[0], "speed_medium")) {
+    control_system_set_speed_medium(t->cs);
+    printf("Medium speed.\r\n");
+  }
+  else if (cli_streq(argv[0], "speed_low")) {
+    control_system_set_speed_low(t->cs);
+    printf("Low speed.\r\n");
+  }
+  else if (cli_streq(argv[0], "speed")) {
+    control_system_set_speed_ratio(t->cs, value);
+    printf("Speed: %f\r\n", (double)value);
+  }
+  else if (cli_streq(argv[0], "pid_d_P")) {
+    ausbee_pid_set_kp(&(t->cs->pid_distance), value);
+    printf("Distance P: %f\r\n", (double)value);
+  }
+  else if (cli_streq(argv[0], "pid_d_I")) {
+    ausbee_pid_set_ki(&(t->cs->pid_distance), value);
+    printf("Distance I: %f\r\n", (double)value);
+  }
+  else if (cli_streq(argv[0], "pid_d_D")) {
+    ausbee_pid_set_kd(&(t->cs->pid_distance), value);
+    printf("Distance D: %f\r\n", (double)value);
+  }
+  else if (cli_streq(argv[0], "pid_a_P")) {
+    ausbee_pid_set_kp(&(t->cs->pid_angle), value);
+    printf("Angle P: %f\r\n", (double)value);
+  }
+  else if (cli_streq(argv[0], "pid_a_I")) {
+    ausbee_pid_set_ki(&(t->cs->pid_angle), value);
+    printf("Angle I: %f\r\n", (double)value);
+  }
+  else if (cli_streq(argv[0], "pid_a_D")) {
+    ausbee_pid_set_kd(&(t->cs->pid_angle), value);
+    printf("Angle D: %f\r\n", (double)value);
+  }
+  else if (cli_streq(argv[0], "axle_track")) {
+    position_set_axle_track_mm(value);
+    printf("Axle track: %f\r\n", (double)value);
+  }
+  else {
+    printf("Invalid argument '%s'.\r\n", argv[0]);
+  }
 }
 
-void cli_execute_start(uint8_t argc, char **argv)
+void cli_execute_start(struct trajectory_manager *t, uint8_t argc, char **argv)
 {
+  if (argc < 1) {
+    printf("Error: the command 'start' needs 1 argument.\r\n");
+  }
+
+  if (cli_streq(argv[0], "pid")) {
+    demo_pid_start(t, 1);
+    printf("Starting PID test.\r\n");
+  }
+  else if (cli_streq(argv[0], "pidi")) {
+    demo_pid_start(t, -1);
+    printf("Starting PID test.\r\n");
+  }
+  else if (cli_streq(argv[0], "ys")) {
+    demo_yellow_side_strategy_start(t);
+    printf("Starting strategy for yellow side.\r\n");
+  }
+  else if (cli_streq(argv[0], "rs")) {
+    demo_red_side_strategy_start(t);
+    printf("Starting strategy for red side.\r\n");
+  }
+  else {
+    printf("Invalid argument '%s'.\r\n", argv[0]);
+  }
 }
 
 void cli_execute_stop(uint8_t argc, char **argv)
 {
+  if (argc < 1) {
+    printf("Error: the command 'stop' needs 1 argument.\r\n");
+  }
+
+  if (cli_streq(argv[0], "pid") || cli_streq(argv[0], "pidi")) {
+    demo_pid_stop();
+    printf("Ending PID test.\r\n");
+  }
+  else if (cli_streq(argv[0], "ys")) {
+    demo_yellow_side_strategy_stop();
+    printf("Ending strategy for yellow side.\r\n");
+  }
+  else if (cli_streq(argv[0], "rs")) {
+    demo_red_side_strategy_stop();
+    printf("Ending strategy for red side.\r\n");
+  }
+  else {
+    printf("Invalid argument '%s'.\r\n", argv[0]);
+  }
 }
 
 void cli_execute_call(uint8_t argc, char **argv)
@@ -215,9 +310,9 @@ void cli_execute_help()
   printf("  a <value>: Rotate with the specified angle in degrees.\r\n");
   printf("  start/stop <arg>: Start/stop a task.\r\n");
   printf("             <arg> can be one of:\r\n");
-  //printf("             ys: Yellow strategy task.\r\n");
-  //printf("             rs: Red strategy task.\r\n");
-  //printf("             pid: PID test task.\r\n");
+  printf("             ys: Yellow strategy task.\r\n");
+  printf("             rs: Red strategy task.\r\n");
+  printf("             pid: PID test task.\r\n");
   printf("  get <arg1> <arg2> ...: Print internal values.\r\n");
   printf("             <argx> can be one of:\r\n");
   printf("             x:        print robot's x position.\r\n");
@@ -230,19 +325,19 @@ void cli_execute_help()
   printf("             last_id:  print position manager's last point id.\r\n");
   printf("             pid_dump: print PID.\r\n");
   printf("  set <arg> <value>: Set internal value.\r\n");
-  //printf("             <value> should be a float.\r\n");
-  //printf("             <arg> can be one of:\r\n");
-  //printf("             speed_high:   set highest translation and rotation speed.\r\n");
-  //printf("             speed_medium: set medium translation and rotation speed.\r\n");
-  //printf("             speed_low:    set low translation and rotation speed.\r\n");
-  //printf("             speed :       set translation and rotation speed ratio to value (0 <= value <= 1).\r\n");
-  //printf("             pid_d_P :     set distance PID proportional value.\r\n");
-  //printf("             pid_d_I :     set distance PID integral value.\r\n");
-  //printf("             pid_d_D :     set distance PID derivative value.\r\n");
-  //printf("             pid_a_P :     set angle PID proportional value.\r\n");
-  //printf("             pid_a_I :     set angle PID integral value.\r\n");
-  //printf("             pid_a_D :     set angle PID derivative value.\r\n");
-  //printf("             axle_track :  set axle track in mm.\r\n");
+  printf("             <value> should be a float.\r\n");
+  printf("             <arg> can be one of:\r\n");
+  printf("             speed_high:   set highest translation and rotation speed.\r\n");
+  printf("             speed_medium: set medium translation and rotation speed.\r\n");
+  printf("             speed_low:    set low translation and rotation speed.\r\n");
+  printf("             speed :       set translation and rotation speed ratio to value (0 <= value <= 1).\r\n");
+  printf("             pid_d_P :     set distance PID proportional value.\r\n");
+  printf("             pid_d_I :     set distance PID integral value.\r\n");
+  printf("             pid_d_D :     set distance PID derivative value.\r\n");
+  printf("             pid_a_P :     set angle PID proportional value.\r\n");
+  printf("             pid_a_I :     set angle PID integral value.\r\n");
+  printf("             pid_a_D :     set angle PID derivative value.\r\n");
+  printf("             axle_track :  set axle track in mm.\r\n");
   //printf("  m <arg> <arg2> : move an actuator\r\n");
   //printf("             <arg> can be one of: \r\n");
   //printf("             arm_l: left_arm \r\n");
@@ -270,10 +365,10 @@ void cli_execute(char *cmd, struct trajectory_manager *t, uint8_t argc, char **a
     cli_execute_get(t, argc, argv);
   }
   else if (cli_streq(cmd, "set")) {   // set a variable
-    cli_execute_set(argc, argv);
+    cli_execute_set(t, argc, argv);
   }
   else if (cli_streq(cmd, "start")) { // start a task
-    cli_execute_start(argc, argv);
+    cli_execute_start(t, argc, argv);
   }
   else if (cli_streq(cmd, "stop")) {  // stop a task
     cli_execute_stop(argc, argv);
