@@ -76,6 +76,8 @@ static void cli_getline(char *buff)
       buff[i++] = (char)c;
       printf("%c", (char)c);
     }
+
+    vTaskDelay(50 / portTICK_RATE_MS);
   }
   // If enter key is pressed before any char is typed, last command is sent
   if ((buff[0] == 0) && (cli_last_buffer != NULL)) {
@@ -114,7 +116,7 @@ void cli_task(void *data)
       cli_execute(cmd, t, argc, argv);
     }
 
-    vTaskDelay(1 / portTICK_RATE_MS);
+    vTaskDelay(50 / portTICK_RATE_MS);
   }
 }
 
