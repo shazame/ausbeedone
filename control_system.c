@@ -31,12 +31,19 @@
 # define UNUSED(x) x
 #endif
 
+// Comment this line to avoid using a control system on motor speed
+#define USE_MOTOR_SPEED_CS
+// Comment this line to avoid using a control system on distance and angle
+#define USE_DISTANCE_ANGLE_CS
+
 void control_system_task(void *data);
+#ifdef USE_DISTANCE_ANGLE_CS
 static void control_system_set_motors_ref(struct control_system *am, float d_mm, float theta);
 static void control_system_set_distance_mm_diff(void *am, float ref);
 static void control_system_set_angle_rad_diff(void *am, float ref);
+#endif
 
-/*
+#ifdef USE_MOTOR_SPEED_CS
 static void control_system_init_motors(struct control_system *am)
 {
   ausbee_pid_init(&(am->pid_right_motor), 2, 0, 0);
@@ -68,8 +75,9 @@ static void control_system_init_motors(struct control_system *am)
   ausbee_cs_set_process_command(&(am->csm_right_motor), motors_wrapper_right_motor_set_duty_cycle, NULL);
   ausbee_cs_set_process_command(&(am->csm_left_motor), motors_wrapper_left_motor_set_duty_cycle, NULL);
 }
-*/
+#endif
 
+#ifdef USE_DISTANCE_ANGLE_CS
 static void control_system_init_distance_angle(struct control_system *am)
 {
   ausbee_pid_init(&(am->pid_distance), 0.04, 0.0005, 0);
@@ -119,11 +127,16 @@ static void control_system_init_distance_angle(struct control_system *am)
   control_system_set_distance_mm_diff(am, 0);
   control_system_set_angle_rad_diff(am, 0);
 }
+#endif
 
 void control_system_start(struct control_system *am)
 {
-  //control_system_init_motors(am);
+#ifdef USE_MOTOR_SPEED_CS
+  control_system_init_motors(am);
+#endif
+#ifdef USE_DISTANCE_ANGLE_CS
   control_system_init_distance_angle(am);
+#endif
 
   xTaskCreate(control_system_task, (const signed char *)"ControlSystem", 200, (void *)am, 1, NULL);
 }
@@ -133,32 +146,46 @@ void control_system_task(void *data)
   for (;;) {
     struct control_system *am = (struct control_system *)data;
 
+#ifdef USE_DISTANCE_ANGLE_CS
     ausbee_cs_manage(&(am->csm_distance));
     ausbee_cs_manage(&(am->csm_angle));
 
     control_system_set_motors_ref(am, am->distance_mm_diff, am->angle_rad_diff);
+#endif
 
-    //ausbee_cs_manage(&(am->csm_right_motor));
-    //ausbee_cs_manage(&(am->csm_left_motor));
+#ifdef USE_MOTOR_SPEED_CS
+    ausbee_cs_manage(&(am->csm_right_motor));
+    ausbee_cs_manage(&(am->csm_left_motor));
+#endif
+
 
     vTaskDelay(CONTROL_SYSTEM_PERIOD_S * 1000 / portTICK_RATE_MS);
   }
 }
 
+#ifdef USE_DISTANCE_ANGLE_CS
+# ifdef USE_MOTOR_SPEED_CS
+static void control_system_set_motors_ref(struct control_system *am, float d_mm, float theta)
+# else
 static void control_system_set_motors_ref(struct control_system *UNUSED(am), float d_mm, float theta)
+# endif
 {
   uint32_t axle_track_mm = position_get_axle_track_mm();
 
   int32_t right_motor_ref = position_mm_to_ticks(d_mm + (1.0 * axle_track_mm * theta) / 2);
   int32_t left_motor_ref  = position_mm_to_ticks(d_mm - (1.0 * axle_track_mm * theta) / 2);
 
+# ifdef USE_MOTOR_SPEED_CS
+  ausbee_cs_set_reference(&(am->csm_right_motor), right_motor_ref);
+  ausbee_cs_set_reference(&(am->csm_left_motor), left_motor_ref);
+# else
   motors_wrapper_right_motor_set_duty_cycle(NULL, right_motor_ref);
   motors_wrapper_left_motor_set_duty_cycle(NULL, left_motor_ref);
-
-  //ausbee_cs_set_reference(&(am->csm_right_motor), right_motor_ref);
-  //ausbee_cs_set_reference(&(am->csm_left_motor), left_motor_ref);
+# endif
 }
+#endif
 
+#ifdef USE_DISTANCE_ANGLE_CS
 static void control_system_set_distance_mm_diff(void *data, float ref)
 {
   struct control_system *am = (struct control_system *)data;
@@ -170,6 +197,7 @@ static void control_system_set_angle_rad_diff(void *data, float ref)
   struct control_system *am = (struct control_system *)data;
   am->angle_rad_diff = ref;
 }
+#endif
 
 // User functions
 void control_system_set_distance_mm_ref(struct control_system *am, float ref)
