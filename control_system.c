@@ -39,14 +39,18 @@ static void control_system_set_angle_rad_diff(void *am, float ref);
 #endif
 
 #ifdef USE_MOTOR_SPEED_CS
+#define TICKS_PER_SECOND_AT_MAX_SPEED 16000
 static void control_system_init_motors(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_right_motor), 0.07, 0.007, 0); // Kp = 100 / 1400, Ki = Kp/10, Kd = 0
-  ausbee_pid_init(&(am->pid_left_motor),  0.07, 0.007, 0);
+  float Kp = 100. / (TICKS_PER_SECOND_AT_MAX_SPEED * CONTROL_SYSTEM_PERIOD_S);
+  float Ki = Kp * 0.1;
+  ausbee_pid_init(&(am->pid_right_motor), Kp, Ki, 0);
+  ausbee_pid_init(&(am->pid_left_motor),  Kp, Ki, 0);
 
   ausbee_diff_init(&(am->diff_right_motor));
   ausbee_diff_init(&(am->diff_left_motor));
 
+  // Max motors' speed command: 100
   ausbee_pid_set_output_range(&(am->pid_right_motor), -100, 100);
   ausbee_pid_set_output_range(&(am->pid_left_motor),  -100, 100);
 
