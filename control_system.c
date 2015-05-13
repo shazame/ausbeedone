@@ -46,8 +46,8 @@ static void control_system_set_angle_rad_diff(void *am, float ref);
 #ifdef USE_MOTOR_SPEED_CS
 static void control_system_init_motors(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_right_motor), 2, 0, 0);
-  ausbee_pid_init(&(am->pid_left_motor),  2, 0, 0);
+  ausbee_pid_init(&(am->pid_right_motor), 0.07, 0.007, 0); // Kp = 100 / 1400, Ki = Kp/10, Kd = 0
+  ausbee_pid_init(&(am->pid_left_motor),  0.07, 0.007, 0);
 
   ausbee_diff_init(&(am->diff_right_motor));
   ausbee_diff_init(&(am->diff_left_motor));
@@ -80,8 +80,8 @@ static void control_system_init_motors(struct control_system *am)
 #ifdef USE_DISTANCE_ANGLE_CS
 static void control_system_init_distance_angle(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_distance), 0.04, 0.0005, 0);
-  ausbee_pid_init(&(am->pid_angle),    0.02, 0.0005, 0);
+  ausbee_pid_init(&(am->pid_distance), 0.4, 0.003, 0);
+  ausbee_pid_init(&(am->pid_angle),    0.4, 0.002, 0);
 
   ausbee_pid_set_output_range(&(am->pid_distance), -100, 100);
   ausbee_pid_set_output_range(&(am->pid_angle),  -100, 100);
