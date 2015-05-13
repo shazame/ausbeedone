@@ -31,11 +31,6 @@
 # define UNUSED(x) x
 #endif
 
-// Comment this line to avoid using a control system on motor speed
-#define USE_MOTOR_SPEED_CS
-// Comment this line to avoid using a control system on distance and angle
-#define USE_DISTANCE_ANGLE_CS
-
 void control_system_task(void *data);
 #ifdef USE_DISTANCE_ANGLE_CS
 static void control_system_set_motors_ref(struct control_system *am, float d_mm, float theta);

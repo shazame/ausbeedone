@@ -25,6 +25,11 @@
 #define ANGLE_MAX_SPEED_DEG 180 // in deg/s
 #define ANGLE_MAX_ACC_DEG   100 // in deg/s^2
 
+// Comment this line to avoid using a control system on motor speed
+#define USE_MOTOR_SPEED_CS
+// Comment this line to avoid using a control system on distance and angle
+//#define USE_DISTANCE_ANGLE_CS
+
 struct control_system {
   struct ausbee_cs csm_right_motor;
   struct ausbee_cs csm_left_motor;
