@@ -64,6 +64,7 @@ int main(void)
   init_gpio_robot();
   init_turbine();
   init_timer_relais();
+  platform_gpio_reset(GPIO_RELAIS);
 
   // Encoders setup
   init_encoders();

@@ -128,7 +128,8 @@ void TIM2_IRQHandler(void)
     elapsed_time++;
     if (elapsed_time>=88)
     {
-      disable_power_relay();
+      //disable_power_relay();
+      platform_gpio_set(GPIO_RELAIS);
     }
     TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   }
