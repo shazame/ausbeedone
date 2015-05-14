@@ -46,15 +46,15 @@
 
 //GPIO
 
-#define GPIO_ENABLE_TURBINE     GPIO1
+//#define GPIO1
+//#define GPIO2
 #define GPIO_RELAIS             GPIO2
-//#define GPIO3
 //#define GPIO4
 //#define GPIO5
 #define GPIO_SELECTION_COULEUR  GPIO6
 //#define GPIO7 
-#define GPIO_TIRETTE            GPIO8
-#define GPIO_CONTACT_CANON      GPIO9
+//#define GPIO8
+#define GPIO_TIRETTE            GPIO9
 
 //Couleur de départ
 #define COULEUR_JAUNE 0

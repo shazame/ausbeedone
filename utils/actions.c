@@ -18,7 +18,7 @@
 // 0 Si elle est absente
 uint8_t presence_tirette(void)
 {
- return (platform_gpio_get_value(GPIO_TIRETTE));
+ return (!platform_gpio_get_value(GPIO_TIRETTE));
 }
 
 //Fonction utilisé pour tester la couleur du camp de départ
