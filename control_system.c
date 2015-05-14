@@ -83,11 +83,13 @@ static void control_system_init_motors(struct control_system *am)
 #ifdef USE_DISTANCE_ANGLE_CS
 static void control_system_init_distance_angle(struct control_system *am)
 {
-  ausbee_pid_init(&(am->pid_distance), 0.4, 0.003, 0);
-  ausbee_pid_init(&(am->pid_angle),    0.4, 0.002, 0);
+  float distance_Ki = 0.003;
+  float angle_Ki = 0.002;
+  ausbee_pid_init(&(am->pid_distance), 0.4, distance_Ki, 0);
+  ausbee_pid_init(&(am->pid_angle),    0.2, angle_Ki, 0);
 
-  ausbee_pid_set_error_sum_range(&(am->pid_distance), -80/0.003, 80/0.003);
-  ausbee_pid_set_error_sum_range(&(am->pid_angle), -80/0.003, 80/0.002);
+  ausbee_pid_set_error_sum_range(&(am->pid_distance), -80/distance_Ki, 80/distance_Ki);
+  ausbee_pid_set_error_sum_range(&(am->pid_angle), -10/angle_Ki, 10/angle_Ki);
 
   ausbee_pid_set_output_range(&(am->pid_distance), -100, 100);
   ausbee_pid_set_output_range(&(am->pid_angle),  -100, 100);

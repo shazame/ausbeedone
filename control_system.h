@@ -28,7 +28,7 @@
 // Comment this line to avoid using a control system on motor speed
 #define USE_MOTOR_SPEED_CS
 // Comment this line to avoid using a control system on distance and angle
-//#define USE_DISTANCE_ANGLE_CS
+#define USE_DISTANCE_ANGLE_CS
 
 struct control_system {
   struct ausbee_cs csm_right_motor;
