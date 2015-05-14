@@ -30,6 +30,9 @@
 #include "demo/demo_yellow_side_strategy.h"
 #include "demo/demo_red_side_strategy.h"
 
+#include "demo/demo_yellow_side_homologation.h"
+#include "demo/demo_green_side_homologation.h"
+
 #include "control_system.h"
 #include "trajectory_manager.h"
 
@@ -38,6 +41,7 @@
 // Private function prototypes
 void blink1();
 void strategy_start();
+void homologation_start();
 // Global variables
 struct control_system am;
 struct trajectory_manager t;
@@ -59,10 +63,9 @@ int main(void)
   platform_usart_init(USART_DEBUG, 115200);
   platform_led_init();
 
-  init_can();
-  init_servo_position_depart();
+  //init_can();
+  //init_servo_position_depart();
   init_gpio_robot();
-  init_turbine();
   init_timer_relais();
   platform_gpio_reset(GPIO_RELAIS);
 
@@ -92,19 +95,21 @@ int main(void)
   // Starting detection system
   gp2_detect_start(&t, &am);
 
-  xTaskCreate(blink1, (const signed char *)"LED1", 100, NULL, 1, NULL );
+  xTaskCreate(blink1, (const signed char *)"LED1", 200, NULL, 1, NULL );
 
   // Launching command line interface
   //cli_start(&t);
 
   // Launching a demonstration
+  //trajectory_goto_d_mm(&t, 1000);
   //demo_square_start(&t);
   //demo_square_reverse_start(&t);
   //demo_circle_start(&t);
   //demo_strat_start(&t);
   //demo_fresque_start(&t);
 
-  strategy_start();
+  //strategy_start();
+  homologation_start();
 
   vTaskStartScheduler();
 
@@ -124,6 +129,29 @@ void blink1(void)
   }
 }
 
+void homologation_start(void)
+{
+  while(!presence_tirette())
+    ;
+  int i = 0;
+  while(i < 10000000) {i++;}; // Warning: DO NOT USE -Os when compiling
+  while(presence_tirette())
+    ;
+
+  elapsed_time = 0;
+
+  if(couleur_depart()==COULEUR_JAUNE)
+  {
+    platform_led_toggle(PLATFORM_LED6);
+    demo_yellow_side_homologation_start(&t);
+  }
+  else if(couleur_depart()==COULEUR_VERTE)
+  {
+    platform_led_toggle(PLATFORM_LED7);
+    demo_green_side_homologation_start(&t);
+  }
+}
+
 void strategy_start(void)
 {
   while(!presence_tirette())
@@ -137,7 +165,7 @@ void strategy_start(void)
   {
     demo_yellow_side_strategy_start(&t);
   }
-  else if(couleur_depart()==COULEUR_ROUGE)
+  else if(couleur_depart()==COULEUR_VERTE)
   {
     demo_red_side_strategy_start(&t);
   }

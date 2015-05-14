@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "platform.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -51,12 +53,12 @@ static void control_system_init_motors(struct control_system *am)
   ausbee_diff_init(&(am->diff_left_motor));
 
   // Max error sum contribution to motors' speed command: 90
-  ausbee_pid_set_error_sum_range(&(am->pid_right_motor), -90/Ki, 90/Ki);
-  ausbee_pid_set_error_sum_range(&(am->pid_left_motor), -90/Ki, 90/Ki);
+  ausbee_pid_set_error_sum_range(&(am->pid_right_motor), -70/Ki, 70/Ki);
+  ausbee_pid_set_error_sum_range(&(am->pid_left_motor), -70/Ki, 70/Ki);
 
   // Max motors' speed command: 100
-  ausbee_pid_set_output_range(&(am->pid_right_motor), -100, 100);
-  ausbee_pid_set_output_range(&(am->pid_left_motor),  -100, 100);
+  ausbee_pid_set_output_range(&(am->pid_right_motor), -80, 80);
+  ausbee_pid_set_output_range(&(am->pid_left_motor),  -80, 80);
 
   // Initialise each control system manager
   ausbee_cs_init(&(am->csm_right_motor));
@@ -84,7 +86,7 @@ static void control_system_init_motors(struct control_system *am)
 static void control_system_init_distance_angle(struct control_system *am)
 {
   float distance_Ki = 0.003;
-  float angle_Ki = 0.002;
+  float angle_Ki = 0.003;
   ausbee_pid_init(&(am->pid_distance), 0.4, distance_Ki, 0);
   ausbee_pid_init(&(am->pid_angle),    0.2, angle_Ki, 0);
 
@@ -166,6 +168,7 @@ void control_system_task(void *data)
     ausbee_cs_manage(&(am->csm_left_motor));
 #endif
 
+    platform_led_toggle(PLATFORM_LED1);
 
     vTaskDelay(CONTROL_SYSTEM_PERIOD_S * 1000 / portTICK_RATE_MS);
   }

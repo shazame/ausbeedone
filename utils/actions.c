@@ -22,8 +22,8 @@ uint8_t presence_tirette(void)
 }
 
 //Fonction utilisé pour tester la couleur du camp de départ
-//Retourne COULEUR_JAUNE si la couleur est Jaune // A verifié
-//Retourne COULEUR_ROUGE si la couleur est Rouge // A vérifié
+//Retourne COULEUR_JAUNE si la couleur est Jaune
+//Retourne COULEUR_VERTE si la couleur est Verte
 uint8_t couleur_depart()
 {
   return (platform_gpio_get_value(GPIO_SELECTION_COULEUR));

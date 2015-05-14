@@ -207,16 +207,18 @@ void init_servo_position_depart()
 //Fonction pour initialiser les gpio en fonction du robot
 void init_gpio_robot()
 {
-  //Contact canon
-  platform_gpio_init(GPIO_CONTACT_CANON, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
   //tirette
   platform_gpio_init(GPIO_TIRETTE, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_DOWN);
   //couleur départ 
   platform_gpio_init(GPIO_SELECTION_COULEUR, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
   //Relais
   platform_gpio_init(GPIO_RELAIS, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
-  //Enable_Turbine
-  platform_gpio_init(GPIO_ENABLE_TURBINE, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_UP);
+  platform_gpio_init(GPIO1, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_gpio_init(GPIO3, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_gpio_init(GPIO4, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_gpio_init(GPIO5, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_gpio_init(GPIO7, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
+  platform_gpio_init(GPIO8, GPIO_OType_PP, GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
 }
 
 //Fonction utilisée pour initialiser le timer chargé de compter les secondes

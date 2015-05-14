@@ -58,6 +58,6 @@
 
 //Couleur de départ
 #define COULEUR_JAUNE 0
-#define COULEUR_ROUGE 1
+#define COULEUR_VERTE 1
 
 #endif //UTILS_DEFINE_H
