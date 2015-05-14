@@ -4,6 +4,7 @@
 #include "task.h"
 
 #include "control_system_debug.h"
+#include "position_manager.h"
 
 #define PI 3.1415926535
 
