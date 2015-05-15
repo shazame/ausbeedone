@@ -12,8 +12,8 @@ void servo_init_starting_position(void)
   ausbeeInitServo(&servo_left_arm);
   ausbeeInitServo(&servo_right_arm);
 
-  ausbeeSetAngleServo(&servo_left_arm, 30);
-  ausbeeSetAngleServo(&servo_right_arm, 75);
+  servo_left_arm_close();
+  servo_right_arm_close();
 }
 
 // Left arm servo

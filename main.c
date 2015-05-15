@@ -107,15 +107,7 @@ int main(void)
   //cli_start(&t);
 
   // Launching a demonstration
-  //trajectory_goto_d_mm(&t, 1000);
-  //demo_square_start(&t);
-  //demo_square_reverse_start(&t);
-  //demo_circle_start(&t);
-  //demo_strat_start(&t);
-  //demo_fresque_start(&t);
-
   strategy_start();
-  //homologation_start();
 
   vTaskStartScheduler();
 
