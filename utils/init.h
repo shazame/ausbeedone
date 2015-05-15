@@ -16,6 +16,5 @@ void init_encoders();
 void init_turbine();
 void init_lidar();
 void init_gpio_robot();
-void init_servo_position_depart();
 void init_timer_relais();
 #endif //INIT_H

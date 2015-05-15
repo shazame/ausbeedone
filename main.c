@@ -21,6 +21,7 @@
 #include "utils/position_manager.h"
 #include "utils/control_system_debug.h"
 #include "utils/gp2_detect.h"
+#include "utils/servo.h"
 
 #include "demo/demo_square.h"
 #include "demo/demo_square_reverse.h"
@@ -64,7 +65,7 @@ int main(void)
   platform_led_init();
 
   //init_can();
-  //init_servo_position_depart();
+  servo_init_starting_position();
   init_gpio_robot();
   init_timer_relais();
   platform_gpio_reset(GPIO_RELAIS);
@@ -138,6 +139,7 @@ void homologation_start(void)
   while(presence_tirette())
     ;
 
+  // Enable irq for relay timer
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
   elapsed_time = 0;
 
@@ -160,6 +162,7 @@ void strategy_start(void)
   while(presence_tirette())
     ;
 
+  // Enable irq for relay timer
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
   elapsed_time = 0;
 

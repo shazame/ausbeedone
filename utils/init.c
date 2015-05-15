@@ -193,17 +193,6 @@ void init_lidar()
   }
 }
 
-//Fonction utilisée pour initialiser les servos sur servo module à leut position de départ
-void init_servo_position_depart()
-{
-  fermer_bras_gauche();
-  fermer_bras_droit();
-  init_servo_peinture_ausbee();
-  init_servo_peinture_canon();
-  fermer_servo_canon_haut();
-  fermer_servo_canon_bas();
-}
-
 //Fonction pour initialiser les gpio en fonction du robot
 void init_gpio_robot()
 {
