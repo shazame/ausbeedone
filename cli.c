@@ -6,6 +6,7 @@
 #include "task.h"
 
 #include "utils/actions.h"
+#include "utils/servo.h"
 #include "utils/position_manager.h"
 #include "cli.h"
 
@@ -173,6 +174,12 @@ void cli_execute_get(struct trajectory_manager *t, uint8_t argc, char **argv)
     else if (cli_streq(argv[i], "encl")) {
       printf("Left encoder value: %f\r\n", (double)position_get_left_encoder(NULL));
     }
+    else if (cli_streq(argv[i], "armr")) {
+      printf("Right arm angle: %d\r\n", servo_right_arm_get_angle());
+    }
+    else if (cli_streq(argv[i], "arml")) {
+      printf("Left arm angle: %d\r\n", servo_left_arm_get_angle());
+    }
     else if (cli_streq(argv[i], "cur_id")) {
       printf("Position manager cur_id: %"PRId32"\r\n", trajectory_get_cur_id(t));
     }
@@ -300,6 +307,27 @@ void cli_execute_stop(uint8_t argc, char **argv)
   }
 }
 
+void cli_execute_move(uint8_t argc, char **argv)
+{
+  if (argc < 2) {
+    printf("Error: the command 'move' needs 2 argument.\r\n");
+  }
+
+  uint8_t value = (uint8_t) strtod(argv[1], NULL);
+
+  if (cli_streq(argv[0], "arm_l")) {
+    servo_left_arm_set_angle(value);
+    printf("Left arm position: %d\r\n", value);
+  }
+  else if (cli_streq(argv[0], "arm_r")) {
+    servo_right_arm_set_angle(value);
+    printf("Right arm position: %d\r\n", value);
+  }
+  else {
+    printf("Invalid argument '%s'.\r\n", argv[0]);
+  }
+}
+
 void cli_execute_call(uint8_t argc, char **argv)
 {
 }
@@ -323,6 +351,8 @@ void cli_execute_help()
   printf("             d:        print robot's distance.\r\n");
   printf("             encl:    print left encoder's value.\r\n");
   printf("             encr:    print right encoder's value.\r\n");
+  printf("             arml:    print left arm's angle.\r\n");
+  printf("             armr:    print right arm's angle.\r\n");
   printf("             cur_id:   print position manager's current point id.\r\n");
   printf("             last_id:  print position manager's last point id.\r\n");
   printf("             pid_dump: print PID.\r\n");
@@ -340,18 +370,10 @@ void cli_execute_help()
   printf("             pid_a_I :     set angle PID integral value.\r\n");
   printf("             pid_a_D :     set angle PID derivative value.\r\n");
   printf("             axle_track :  set axle track in mm.\r\n");
-  //printf("  m <arg> <arg2> : move an actuator\r\n");
-  //printf("             <arg> can be one of: \r\n");
-  //printf("             arm_l: left_arm \r\n");
-  //printf("             arm_r: right_arm \r\n");
-  //printf("                <arg2> can be one of: \r\n");
-  //printf("                close: close the arm \r\n");
-  //printf("                open: open the arm \r\n");
-  //printf("             paint_r: right_paint \r\n");
-  //printf("             paint_l: left_paint \r\n");
-  //printf("                <arg2> can be one of: \r\n");
-  //printf("                put: put the paint on the \"fresque\" \r\n");
-  //printf("                release: release the paint on the \"fresque\" \r\n");
+  printf("  move <arg> <value> : move an actuator to the given position (between 0 and 100)\r\n");
+  printf("             <arg> can be one of: \r\n");
+  printf("             arm_l: left_arm\r\n");
+  printf("             arm_r: right_arm\r\n");
   printf("  help: Display this help.\r\n");
 }
 
@@ -374,6 +396,9 @@ void cli_execute(char *cmd, struct trajectory_manager *t, uint8_t argc, char **a
   }
   else if (cli_streq(cmd, "stop")) {  // stop a task
     cli_execute_stop(argc, argv);
+  }
+  else if (cli_streq(cmd, "move")) {  // move an actuator
+    cli_execute_move(argc, argv);
   }
   else if (cli_streq(cmd, "call")) {  // call a function
     cli_execute_call(argc, argv);
