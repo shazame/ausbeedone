@@ -11,7 +11,7 @@
 #include "cli.h"
 
 #include "demo/demo_yellow_side_strategy.h"
-#include "demo/demo_red_side_strategy.h"
+#include "demo/demo_green_side_strategy.h"
 #include "demo/demo_pid.h"
 
 char cli_last_buffer[CLI_BUFFER_SIZE] = {0};
@@ -21,7 +21,7 @@ void cli_execute(char *cmd, struct trajectory_manager *t, uint8_t argc, char **a
 
 void cli_start(struct trajectory_manager *t)
 {
-  xTaskCreate(cli_task, (const signed char *)"CLI", 200, (void *)t, 1, NULL );
+  xTaskCreate(cli_task, (const signed char *)"CLI", 300, (void *)t, 1, NULL );
 }
 
 static void cli_getline(char *buff)
@@ -276,8 +276,8 @@ void cli_execute_start(struct trajectory_manager *t, uint8_t argc, char **argv)
     printf("Starting strategy for yellow side.\r\n");
   }
   else if (cli_streq(argv[0], "rs")) {
-    demo_red_side_strategy_start(t);
-    printf("Starting strategy for red side.\r\n");
+    demo_green_side_strategy_start(t);
+    printf("Starting strategy for green side.\r\n");
   }
   else {
     printf("Invalid argument '%s'.\r\n", argv[0]);
@@ -299,8 +299,8 @@ void cli_execute_stop(uint8_t argc, char **argv)
     printf("Ending strategy for yellow side.\r\n");
   }
   else if (cli_streq(argv[0], "rs")) {
-    demo_red_side_strategy_stop();
-    printf("Ending strategy for red side.\r\n");
+    demo_green_side_strategy_stop();
+    printf("Ending strategy for green side.\r\n");
   }
   else {
     printf("Invalid argument '%s'.\r\n", argv[0]);
