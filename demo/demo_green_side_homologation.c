@@ -3,8 +3,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "../utils/actions.h"
-
 #include "demo_green_side_homologation.h"
 
 void demo_green_side_homologation_task(void * data);
@@ -24,5 +22,6 @@ void demo_green_side_homologation_task(void* data)
   while(!trajectory_is_ended(t));
   trajectory_goto_d_mm(t, 900);
   while(!trajectory_is_ended(t));
+
   while(1) { vTaskDelay(100 / portTICK_RATE_MS); }
 }  

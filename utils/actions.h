@@ -5,10 +5,6 @@
 
 uint8_t presence_tirette();
 uint8_t couleur_depart();
-uint8_t contact_fresque();
-
-void enable_turbine();
-void disable_turbine();
 
 void enable_power_relay();
 void disable_power_relay();

@@ -3,8 +3,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "../utils/actions.h"
-
 #include "demo_yellow_side_homologation.h"
 
 void demo_yellow_side_homologation_task(void * data);

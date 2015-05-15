@@ -29,26 +29,6 @@ uint8_t couleur_depart()
   return (platform_gpio_get_value(GPIO_SELECTION_COULEUR));
 }
 
-//Fonction utilisée pour tester si le capteur à contact en bout de canon est actif ou non
-//retourne 1 si le capteur detecte quelque chose
-//retourne 0 sinon
-uint8_t contact_fresque()
-{
-  return (platform_gpio_get_value(GPIO_CONTACT_CANON));
-}
-
-//Fonction utilisée pour activer la turbine
-void enable_turbine()
-{
-  platform_gpio_reset(GPIO_ENABLE_TURBINE);
-}
-
-//Fonction utilisée pour desactiver la turbine
-void disable_turbine()
-{
-  platform_gpio_set(GPIO_ENABLE_TURBINE);
-}
-
 //Fonction utilisée pour désactiver la puissance (relais)
 void enable_power_relay(void)
 {
