@@ -29,7 +29,7 @@
 #include "demo/demo_strat.h"
 #include "demo/demo_fresque.h"
 #include "demo/demo_yellow_side_strategy.h"
-#include "demo/demo_red_side_strategy.h"
+#include "demo/demo_green_side_strategy.h"
 
 #include "demo/demo_yellow_side_homologation.h"
 #include "demo/demo_green_side_homologation.h"
@@ -114,8 +114,8 @@ int main(void)
   //demo_strat_start(&t);
   //demo_fresque_start(&t);
 
-  //strategy_start();
-  homologation_start();
+  strategy_start();
+  //homologation_start();
 
   vTaskStartScheduler();
 
@@ -177,6 +177,6 @@ void strategy_start(void)
   }
   else if(couleur_depart()==COULEUR_VERTE)
   {
-    demo_red_side_strategy_start(&t);
+    demo_green_side_strategy_start(&t);
   }
 }
