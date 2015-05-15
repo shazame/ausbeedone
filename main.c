@@ -138,6 +138,7 @@ void homologation_start(void)
   while(presence_tirette())
     ;
 
+  TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
   elapsed_time = 0;
 
   if(couleur_depart()==COULEUR_JAUNE)
@@ -159,6 +160,7 @@ void strategy_start(void)
   while(presence_tirette())
     ;
 
+  TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
   elapsed_time = 0;
 
   if(couleur_depart()==COULEUR_JAUNE)

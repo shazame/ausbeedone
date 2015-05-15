@@ -237,7 +237,5 @@ void init_timer_relais()
 
   TIM_TimeBaseInit(TIM2, &TimeBaseInit_relais);            // Initialize TIM2
   NVIC_EnableIRQ(TIM2_IRQn);
-  TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
   TIM_Cmd(TIM2, ENABLE);
-
 }
