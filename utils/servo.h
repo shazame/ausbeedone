@@ -1,6 +1,8 @@
 #ifndef SERVO_H
 #define SERVO_H
 
+#include <stdint.h>
+
 void servo_init_starting_position(void);
 
 uint8_t servo_left_arm_get_angle(void);

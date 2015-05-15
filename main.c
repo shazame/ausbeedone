@@ -63,9 +63,14 @@ int main(void)
   platform_hse_pll_init();
   platform_usart_init(USART_DEBUG, 115200);
   platform_led_init();
+  platform_gpio_init(GPIO_SELECTION_COULEUR, GPIO_OType_PP, GPIO_Mode_IN, GPIO_Speed_50MHz, GPIO_PuPd_NOPULL);
 
   //init_can();
+  // Servo
+  platform_pwm_init(TIMER11);
+  platform_pwm_init(TIMER13);
   servo_init_starting_position();
+
   init_gpio_robot();
   init_timer_relais();
   platform_gpio_reset(GPIO_RELAIS);
