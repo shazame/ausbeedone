@@ -92,7 +92,7 @@ int main(void)
   // Launching control system
   control_system_start(&am);
   // With debug output
-  control_system_debug_start(&am);
+  //control_system_debug_start(&am);
 
   // Launching trajectory manager
   trajectory_init(&t, &am);

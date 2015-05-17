@@ -130,6 +130,7 @@ void TIM2_IRQHandler(void)
     {
       //disable_power_relay();
       platform_gpio_set(GPIO_RELAIS);
+      platform_led_toggle(PLATFORM_LED5);
     }
     TIM_ClearFlag(TIM2, TIM_FLAG_Update);
   }

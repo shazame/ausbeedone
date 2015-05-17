@@ -38,17 +38,12 @@ void demo_green_side_strategy_task(void* data)
   while(!trajectory_is_ended(t));
   trajectory_goto_a_rel_deg(t,-45);
   while(!trajectory_is_ended(t));
-  trajectory_goto_d_mm(t,-650);// Recul, recalage?
+  trajectory_goto_d_mm(t,-800);// Recul, recalage?
   while(!trajectory_is_ended(t));
   servo_left_arm_open();
-  trajectory_goto_d_mm(t,500);
+  trajectory_goto_d_mm(t,795);
   while(!trajectory_is_ended(t));
   servo_left_arm_close();
-  trajectory_goto_d_mm(t,600);
-  while(!trajectory_is_ended(t));
-  servo_left_arm_open();
-  trajectory_goto_d_mm(t,500);
-  while(!trajectory_is_ended(t));
 
   while(1) { vTaskDelay(100 / portTICK_RATE_MS); }
 }
